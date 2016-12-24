@@ -1,7 +1,14 @@
 from nltk.corpus import PlaintextCorpusReader #maak corpus
 corpus_root= 'data'
 wordlists = PlaintextCorpusReader(corpus_root, '.*')
-new_corpus = wordlists.fileids()
+corpus = wordlists.fileids()
+print(corpus)
+print(wordlists.words('arabian_nights_burton_vol01.txt'))
+print(wordlists.sents('arabian_nights_burton_vol01.txt')[0:20])
+
+
+
+
 #print(new_corpus)
 #wordlists.words('file_name')--> of .sents om aparte woorden of zinnen per file te krijgen
 
@@ -10,5 +17,5 @@ new_corpus = wordlists.fileids()
 #from nltk.stem.wordnet import WordNetLemmatizer
 #import string
 
-import gensim
-from gensim import corpora
+#import gensim
+#from gensim import corpora
