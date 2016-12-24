@@ -2,7 +2,7 @@
 #Text analyses of 1001-nights#
 ##############################
 
-#Make a corpus of the ten volumes:
+# Make a corpus of the ten volumes:
 from os import listdir
 
 def list_10_volumes(directory):
@@ -15,8 +15,8 @@ def list_10_volumes(directory):
 corpus = list_10_volumes('data')
 print(corpus)
 
-#How many characters does each volume in the corpus have? 
-#and how many characters does the entire corpus have?
+# How many characters does each volume in the corpus have? 
+# and how many characters does the entire corpus have?
 def calculate_characters(corpus):
 	counter = 0
 	for volume in corpus:
@@ -29,7 +29,7 @@ def calculate_characters(corpus):
 
 print(calculate_characters(corpus))		
 
-#How many lines does the entire corpus have?
+# How many lines does the entire corpus have?
 def calculate_lines(corpus):
 	count = 0
 	for volume in corpus:
@@ -41,7 +41,7 @@ def calculate_lines(corpus):
 			
 print(calculate_lines(corpus))	
 
-#How many lines does each volume have?
+# How many lines does each volume have?
 def calculate_lines_II(file):
 	count = 0
 	f = open (file, 'rt', encoding='utf-8') 
@@ -53,9 +53,9 @@ def calculate_lines_II(file):
 for volume in corpus: 
 	print(calculate_lines_II(volume))		
 
-#In order to calculate the amount of words and sentences in each volume,
-#I made a new corpus of the volumes using the nltk PlaintextCorpusReader
-#which has some easy tools that can split a text into a list of words or sentences
+# In order to calculate the amount of words and sentences in each volume,
+# I made a new corpus of the volumes using the nltk PlaintextCorpusReader
+# which has some easy tools that can split a text into a list of words or sentences.
 
 from nltk.corpus import PlaintextCorpusReader
 corpus_root= 'data'
@@ -74,5 +74,40 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 	print(item,':', len(volumes.sents(item)), 'sentences')	
 
 ####################################################################################
-#Now that we know some of the statistics about each volume and the entire corpus, we
-#want to have a look at the individual nights. 
+# Now that we know some of the statistics about each volume and the entire corpus, we
+# Want to have a look at the individual nights. 
+
+# To make sure all the volumes are automatically read. 
+read_corpus = []
+for volume in corpus:
+	f = open(volume, 'rt', encoding='utf-8') 
+	text = f.read()
+	f.close()
+	read_corpus.append(text)	
+
+import re
+
+# Two definitions that can find the starting and ending index of each night. 
+def start_idex_nights(regex, text, flags=re.IGNORECASE): # So it is case insensitive.
+	start_index = []
+	for match in re.finditer(regex, text, flags):
+		start_index.append(match.start())
+	return start_index	
+
+def start_and_end_index_nights(volume):
+	start_index = start_idex_nights("When it was the.*Night,?\n", volume)
+	night_indexes = []
+	for i in range(len(start_index)-1): # Minus 1 because the last night of each volume is no new start index of the next night (which is in the next volume).
+		night_indexes.append((start_index[i], start_index[i+1])) # You get the index of a night and the subsequent night, which is the end index of the previous night.	
+	night_indexes.append((start_index[-1], len(volume) - 1)) # Here the indexes of the last night of a volume are added.
+	return night_indexes
+
+counter = 0
+for volume in read_corpus:
+	counter+= (len(start_and_end_index_nights(volume)))
+print(counter) # It seems there are only 990 nights in the ten volumes, or at least, 990 nights are extracted. 
+
+# The next step is to put each night in a separate file. (I will do that asap)
+	
+
+
