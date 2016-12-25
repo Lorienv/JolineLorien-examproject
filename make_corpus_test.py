@@ -1,7 +1,21 @@
+<<<<<<< HEAD
 #from nltk.corpus import PlaintextCorpusReader #maak corpus
 #corpus_root= 'data'
 #wordlists = PlaintextCorpusReader(corpus_root, '.*')
 #new_corpus = wordlists.fileids()
+=======
+from nltk.corpus import PlaintextCorpusReader #maak corpus
+corpus_root= 'data'
+wordlists = PlaintextCorpusReader(corpus_root, '.*')
+corpus = wordlists.fileids()
+print(corpus)
+print(wordlists.words('arabian_nights_burton_vol01.txt'))
+print(wordlists.sents('arabian_nights_burton_vol01.txt')[0:20])
+
+
+
+
+>>>>>>> origin/master
 #print(new_corpus)
 #wordlists.words('file_name')--> of .sents om aparte woorden of zinnen per file te krijgen
 
@@ -12,6 +26,7 @@
 
 #import gensim
 #from gensim import corpora
+<<<<<<< HEAD
 
 
 from os import listdir
@@ -74,3 +89,5 @@ plt.xlabel("volume")
 plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
 plt.show()
+=======
+>>>>>>> origin/master
