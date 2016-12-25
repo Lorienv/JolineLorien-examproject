@@ -27,7 +27,7 @@ def calculate_characters(corpus):
 		counter+= len(text)
 	print('Together, the ten volumes have ' + str(counter) + ' characters.' )
 
-print(calculate_characters(corpus))		
+print(calculate_characters(corpus))	
 
 # How many lines does the entire corpus have?
 def calculate_lines(corpus):
@@ -74,6 +74,48 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 	print(item,':', len(volumes.sents(item)), 'sentences')	
 
 ####################################################################################
+<<<<<<< HEAD
+#Now that we know some of the statistics about each volume and the entire corpus, we
+#want to have a look at the individual nights. 
+####################################################################################
+
+#visualization of the statistiscs with basic plotting techniques:
+
+#make a list of the total characters per volume ---> lijst maken van de counters die def(calculate_characters) teruggeeft
+import matplotlib.pyplot as plt #pyhton library for plotting data
+import numpy as np
+#%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
+
+#characters_per_volume= []
+#characters_per_volume.append(calculate_characters(corpus)) #ik weet niet hoe ik hier een lijst van kan maken
+#dit klopt niet, de aparte counters komen niet in een lijst
+#print(characters_per_volume)
+
+characters_per_volume = [719626, 713975, 740002, 608981, 805537, 620786, 816219, 728202, 743379, 130715] #nu heb ik handmatig een lijst gemaakt
+ #van de aantallen characters per volume
+x = [1,2,3,4,5,6,7,8,9,10]
+y = characters_per_volume
+x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
+y_labels = [719626, 713975, 740002, 608981, 805537, 620786, 816219, 728202, 743379, 130715]
+width = 0.8 # width of the bars
+fig, ax = plt.subplots()
+rects1 = ax.bar(x, y_labels)
+def autolabel(rects):# attach labels above bars #zoals gevonden op matplotlib site
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                '%d' % int(height),
+                ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
+        #and the number that is put on top of each column is written by: '%d' %int(height). 
+        #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
+print(autolabel(rects1))
+plt.bar(x,y)
+plt.title("total characters in one volume")
+plt.xlabel("volume")
+plt.ylabel("# of characters")
+plt.xticks(x,x_labels)
+plt.show()
+=======
 # Now that we know some of the statistics about each volume and the entire corpus, we
 # Want to have a look at the individual nights. 
 
@@ -111,3 +153,4 @@ print(counter) # It seems there are only 990 nights in the ten volumes, or at le
 	
 
 
+>>>>>>> origin/master
