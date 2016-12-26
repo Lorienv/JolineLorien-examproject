@@ -74,7 +74,7 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 	print(item,':', len(volumes.sents(item)), 'sentences')	
 
 ####################################################################################
-#<<<<<<< HEAD
+<<<<<<< HEAD
 #Now that we know some of the statistics about each volume and the entire corpus, we
 #want to have a look at the individual nights. 
 ####################################################################################
@@ -222,7 +222,7 @@ plt.show()
 #visualize all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
 #I would like to make a table with the following cells, but I don't know how yet
 #data_matrix = [['Statistiscs', 'Total characters', 'total lines', 'total sentences', 'total words'],
-               ['The Arabian Nights', 6627422 , 115463, 43094, 1459332 ]]
+               #['The Arabian Nights', 6627422 , 115463, 43094, 1459332 ]]
 
 
 #########################################################################################
@@ -264,4 +264,4 @@ print(counter) # It seems there are only 990 nights in the ten volumes, or at le
 	
 
 
-#>>>>>>> origin/master
+>>>>>>> origin/master
