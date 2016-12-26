@@ -79,16 +79,19 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 #want to have a look at the individual nights. 
 ####################################################################################
 
-#visualization of the statistiscs with basic plotting techniques:
 
-#make a list of the total characters per volume ---> lijst maken van de counters die def(calculate_characters) teruggeeft
+#visualization of the statistiscs with basic plotting techniques
+
 import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
+#visualize the characters per volume
+#make a list of the total characters per volume ---> lijst maken van de counters die def(calculate_characters) teruggeeft
 #characters_per_volume= []
-#characters_per_volume.append(calculate_characters(corpus)) #ik weet niet hoe ik hier een lijst van kan maken
-#dit klopt niet, de aparte counters komen niet in een lijst
+#for volume in corpus:
+	#characters_per_volume.append(calculate_characters(corpus)) #ik weet niet hoe ik hier een lijst van kan maken
+#dit klopt niet, de aparte counters zonder tekst komen niet in een lijst, wel de tekst en de counters
 #print(characters_per_volume)
 
 characters_per_volume = [719626, 713975, 740002, 608981, 805537, 620786, 816219, 728202, 743379, 130715] #nu heb ik handmatig een lijst gemaakt
@@ -98,8 +101,9 @@ y = characters_per_volume
 x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
 y_labels = [719626, 713975, 740002, 608981, 805537, 620786, 816219, 728202, 743379, 130715]
 width = 0.8 # width of the bars
-fig, ax = plt.subplots()
-rects1 = ax.bar(x, y_labels)
+fig, ax = plt.subplots() #make subplots, so that their will be labels above the bars
+rects1 = ax.bar(x, y_labels) #rects stands for rectangles, the shape of the bar chart. 
+
 def autolabel(rects):# attach labels above bars #zoals gevonden op matplotlib site
     for rect in rects:
         height = rect.get_height()
@@ -109,13 +113,120 @@ def autolabel(rects):# attach labels above bars #zoals gevonden op matplotlib si
         #and the number that is put on top of each column is written by: '%d' %int(height). 
         #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
 print(autolabel(rects1))
-plt.bar(x,y)
-plt.title("total characters in one volume")
+
+plt.bar(x,y) #plot a bar chart and attach some information to it
+plt.title("total number of characters in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
 plt.show()
-=======
+
+
+#visualize the lines per volume
+#make a list of the total lines per volume ---> lijst maken van de counters die def(calculate_lines_II(volume)) teruggeeft 
+lines_per_volume = []
+for volume in corpus:
+	lines_per_volume.append(calculate_lines_II(volume)) #ik weet niet hoe ik hier een lijst van kan maken
+#dit klopt niet, de aparte counters zonder tekst komen niet in een lijst, wel de tekst en de counters
+print(lines_per_volume)
+
+lines_per_volume = [ 12498, 12159, 13092, 10925, 14585, 10491, 13786, 13189, 12517, 2221 ] #I made this list manually
+x = [1,2,3,4,5,6,7,8,9,10]
+y = lines_per_volume
+x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
+y_labels = [12498, 12159, 13092, 10925, 14585, 10491, 13786, 13189, 12517, 2221 ]
+width = 0.8 # width of the bars
+fig, ax = plt.subplots() #make subplots, so that their will be labels above the bars
+rects2 = ax.bar(x, y_labels) #rects stands for rectangles, the shape of the bar chart. 
+
+def autolabel(rects):# attach labels above bars as recommanded by the matplotlib site
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                '%d' % int(height),
+                ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
+        #and the number that is put on top of each column is written by: '%d' %int(height). 
+        #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
+print(autolabel(rects2))
+
+plt.bar(x,y) #plot a bar chart and attach some information to it
+plt.title("total number of lines in a volume")
+plt.xlabel("volume")
+plt.ylabel("# of lines")
+plt.xticks(x,x_labels)
+plt.show()
+
+#visualize the sentences per volume
+sentences_per_volume = []
+for item in volumes.fileids():
+	sentences_per_volume.append(len(volumes.sents(item)))
+print(sentences_per_volume)
+
+x = [1,2,3,4,5,6,7,8,9,10]
+y = sentences_per_volume
+x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
+y_labels = sentences_per_volume
+width = 0.8 # width of the bars
+fig, ax = plt.subplots() #make subplots, so that their will be labels above the bars
+rects1 = ax.bar(x, y_labels) #rects stands for rectangles, the shape of the bar chart. 
+
+def autolabel(rects):# attach labels above bars as recommanded by the matplotlib site
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                '%d' % int(height),
+                ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
+        #and the number that is put on top of each column is written by: '%d' %int(height). 
+        #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
+print(autolabel(rects1))
+
+plt.bar(x,y) #plot a bar chart and attach some information to it
+plt.title("total number of sentences in a volume")
+plt.xlabel("volume")
+plt.ylabel("# of sentences")
+plt.xticks(x,x_labels)
+plt.show()
+
+
+#visualize the words per volume
+words_per_volume = []
+for item in volumes.fileids():
+	words_per_volume.append(len(volumes.words(item)))
+print(words_per_volume)
+
+x = [1,2,3,4,5,6,7,8,9,10]
+y = words_per_volume
+x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
+y_labels = words_per_volume
+width = 0.8 # width of the bars
+fig, ax = plt.subplots() #make subplots, so that their will be labels above the bars
+rects1 = ax.bar(x, y_labels) #rects stands for rectangles, the shape of the bar chart. 
+
+def autolabel(rects):# attach labels above bars as recommanded by the matplotlib site
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+                '%d' % int(height),
+                ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
+        #and the number that is put on top of each column is written by: '%d' %int(height). 
+        #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
+print(autolabel(rects1))
+
+plt.bar(x,y) #plot a bar chart and attach some information to it
+plt.title("total number of words in a volume")
+plt.xlabel("volume")
+plt.ylabel("# of words")
+plt.xticks(x,x_labels)
+plt.show()
+
+#visualize all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
+#I would like to make a table with the following cells, but I don't know how yet
+#data_matrix = [['Statistiscs', 'Total characters', 'total lines', 'total sentences', 'total words'],
+               #['The Arabian Nights', 6627422 , 115463, 43094, 1459332 ]]
+
+
+#########################################################################################
+
 # Now that we know some of the statistics about each volume and the entire corpus, we
 # Want to have a look at the individual nights. 
 
