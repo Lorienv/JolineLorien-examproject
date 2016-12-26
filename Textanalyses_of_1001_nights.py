@@ -19,13 +19,14 @@ print(corpus)
 # and how many characters does the entire corpus have?
 def calculate_characters(corpus):
 	counter = 0
+	characters_per_volume = []
 	for volume in corpus:
 		f = open(volume, 'rt', encoding='utf-8') 
 		text = f.read()
 		f.close()
-		print(volume + ' has ' + str(len(text)) + ' characters.')	
+		characters_per_volume.append(len(text))	
 		counter+= len(text)
-	print('Together, the ten volumes have ' + str(counter) + ' characters.' )
+	return characters_per_volume, 'Together, the ten volumes have ' + str(counter) + ' characters.'
 
 print(calculate_characters(corpus))	
 
@@ -48,7 +49,7 @@ def calculate_lines_II(file):
 	for line in f:
 		count += 1
 	f.close()
-	return file + ' has ' + str(count) + ' lines.'
+	return [file, ' has ', count, 'lines.']
 
 for volume in corpus: 
 	print(calculate_lines_II(volume))		
@@ -73,14 +74,9 @@ for item in volumes.fileids(): #calculate the amount of words in each volume
 for item in volumes.fileids(): #calculate the amount of sentences in each volume
 	print(item,':', len(volumes.sents(item)), 'sentences')	
 
-####################################################################################
-<<<<<<< HEAD
-#Now that we know some of the statistics about each volume and the entire corpus, we
-#want to have a look at the individual nights. 
-####################################################################################
-
-
+##################################################################
 #visualization of the statistiscs with basic plotting techniques
+##################################################################
 
 import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
@@ -94,8 +90,7 @@ import numpy as np
 #dit klopt niet, de aparte counters zonder tekst komen niet in een lijst, wel de tekst en de counters
 #print(characters_per_volume)
 
-characters_per_volume = [719626, 713975, 740002, 608981, 805537, 620786, 816219, 728202, 743379, 130715] #nu heb ik handmatig een lijst gemaakt
- #van de aantallen characters per volume
+characters_per_volume = (calculate_characters(corpus))[0]
 x = [1,2,3,4,5,6,7,8,9,10]
 y = characters_per_volume
 x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
@@ -121,16 +116,12 @@ plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
 plt.show()
 
-
 #visualize the lines per volume
 #make a list of the total lines per volume ---> lijst maken van de counters die def(calculate_lines_II(volume)) teruggeeft 
 lines_per_volume = []
-for volume in corpus:
-	lines_per_volume.append(calculate_lines_II(volume)) #ik weet niet hoe ik hier een lijst van kan maken
-#dit klopt niet, de aparte counters zonder tekst komen niet in een lijst, wel de tekst en de counters
-print(lines_per_volume)
+for volume in corpus: 
+	lines_per_volume.append((calculate_lines_II(volume))[2]) 
 
-lines_per_volume = [ 12498, 12159, 13092, 10925, 14585, 10491, 13786, 13189, 12517, 2221 ] #I made this list manually
 x = [1,2,3,4,5,6,7,8,9,10]
 y = lines_per_volume
 x_labels = ["vol1","vol2","vol3","vol4","vol5","vol6","vol7","vol8","vol9","vol10"]
@@ -264,4 +255,3 @@ print(counter) # It seems there are only 990 nights in the ten volumes, or at le
 	
 
 
->>>>>>> origin/master
