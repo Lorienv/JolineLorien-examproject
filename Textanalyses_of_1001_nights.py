@@ -211,10 +211,27 @@ plt.xticks(x,x_labels)
 plt.show()
 
 #visualize all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
-#I would like to make a table with the following cells, but I don't know how yet
-#data_matrix = [['Statistiscs', 'Total characters', 'total lines', 'total sentences', 'total words'],
-               #['The Arabian Nights', 6627422 , 115463, 43094, 1459332 ]]
+import texttable as tt#import texttable module
+tab = tt.Texttable() #initialize texttable object
 
+header = ['Corpus', 'Total characters', 'Total lines', 'Total sentences', 'Total words']#To insert a header we create a list with each element containing the title of a column
+tab.header(header)# add it to the table using the header() method of the TextTable object.
+
+row = ['The Arabian Nights', '6627422', '115463', '43094','1459332']
+tab.add_row(row) #To insert a row into the table, we create a list with the elements of the row and add it to the table
+
+tab.set_cols_width([18,18,18,18,18])#set the width of the table cells
+#set the horizontal and vertical alignment of data within table cells
+tab.set_cols_align(['c','c', 'c','c', 'c']) #‘c’ for center alignment 
+
+tab.set_deco(tab.HEADER | tab.VLINES)#control drawing of lines between rows and columns and between the header and the first row
+#I choose for a line below the header and lines between columns
+
+tab.set_chars(['-','|','+','#'])#list of elements which determine character used for horizontal lines, vertical lines,
+#intersection points of these lines and the header line, in that order
+
+table_statistics = tab.draw()#table is returned as a string
+print(table_statistics)
 
 #########################################################################################
 
