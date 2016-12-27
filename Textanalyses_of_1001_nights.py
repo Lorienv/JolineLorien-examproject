@@ -268,7 +268,13 @@ for volume in read_corpus:
 	counter+= (len(start_and_end_index_nights(volume)))
 print(counter) # It seems there are only 990 nights in the ten volumes, or at least, 990 nights are extracted. 
 
-# The next step is to put each night in a separate file. (I will do that asap)
-	
-
+#Now we put each night into a separate file using the indexes calculated above.
+for volume in read_corpus:
+	indexes_night = start_and_end_index_nights(volume)
+	for i in indexes_night:
+		sentence = volume[i[0]+15:i[0]+150]
+		sentence = sentence.split(',')
+		filename = 'data/'+ str("".join(sentence[0])) + '.txt'
+		f = open(filename,'wt', encoding='utf-8')
+		f.write(volume[i[0]:i[1]])
 
