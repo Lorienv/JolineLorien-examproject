@@ -233,10 +233,12 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 table_statistics = tab.draw()#table is returned as a string
 print(table_statistics)
 
-#########################################################################################
+##################################
+#Separate the volumes into nights
+##################################
 
 # Now that we know some of the statistics about each volume and the entire corpus, we
-# Want to have a look at the individual nights. 
+# want to have a look at the individual nights. 
 
 # To make sure all the volumes are automatically read. 
 read_corpus = []
@@ -269,12 +271,82 @@ for volume in read_corpus:
 print(counter) # It seems there are only 990 nights in the ten volumes, or at least, 990 nights are extracted. 
 
 #Now we put each night into a separate file using the indexes calculated above.
+
 for volume in read_corpus:
 	indexes_night = start_and_end_index_nights(volume)
 	for i in indexes_night:
-		sentence = volume[i[0]+15:i[0]+150]
-		sentence = sentence.split(',')
+		sentence = volume[i[0]+15:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
+		sentence = sentence.split(',')	
 		filename = 'data/'+ str("".join(sentence[0])) + '.txt'
 		f = open(filename,'wt', encoding='utf-8')
 		f.write(volume[i[0]:i[1]])
+
+#There are a few files that have a name like ' Eight Hundred and Thirty-sixth Night \n\n She said', because 'she said' stood befor the comma
+#I tried to solve it by doing this, but it didn't work. I don't know why though...
+
+#import os
+#import re
+#pattern = re.compile(r'\n*[Ss]he said')
+#for fileName in os.listdir('data'):
+#	if pattern.search(fileName):
+#		os.rename(fileName, pattern.sub('', fileName))
+
+#####################################
+#Calculate statistics for each night
+#####################################   	
+
+#Make a new corpus, consisting of the nights so statistics can be calculated
+#Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
+
+#I now manually changed the names of those files who were named wrong in order to create a corpus
+
+def corpus_nights(directory): #I slightly changed the function used to make a corpus of the ten volumes
+	nights = []
+	for night in listdir(directory):
+		if night.endswith('ight.txt'):
+			nights.append(directory + '/' + night)
+	return nights
+
+corpus_nights = corpus_nights('data')
+
+#How many characters does each night have? 
+def calculate_characters_nights(corpus):
+	characters_per_night = {}
+	for night in corpus:
+		f = open(night, 'rt', encoding='utf-8') 
+		text = f.read()
+		f.close()
+		characters_per_night[night] = len(text)
+	return characters_per_night
+
+char_dict_night = calculate_characters_nights(corpus_nights)
+
+#How many lines does each night have?
+def calculate_lines_night(file):
+	count = 0
+	f = open (file, 'rt', encoding='utf-8') 
+	for line in f:
+		count += 1
+	f.close()
+	return count
+
+line_dict_nights = {}
+for night in corpus_nights:
+	line_dict_nights[night] = calculate_lines_night(night)
+print(line_dict_nights)	
+
+#to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
+corpus_root= 'data'
+corpus_nightsII = PlaintextCorpusReader(corpus_root, '.*[nN]ight.txt')	
+print(len(corpus_nightsII.fileids())) 
+
+word_dic_nights = {}
+for file in corpus_nightsII.fileids(): #calculate the amount of words in each volume
+	word_dic_nights[file] = len(corpus_nightsII.words(file))
+
+sentence_dic_nights = {}
+for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
+	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
+
+
 
