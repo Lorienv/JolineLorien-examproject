@@ -347,5 +347,30 @@ sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
 ##################################### 
 
 #collect data for table with total numbers for each night
-char_dict_night = calculate_characters_nights(corpus_nights)
-print(char_dict_night)
+
+characters_per_night = [] #list of the characters per night
+for value in dict.values(char_dict_night):
+	characters_per_night.append(value)
+#print(characters_per_night)
+
+lines_per_night = [] #list of the lines per night
+for value in dict.values(line_dict_nights):
+	lines_per_night.append(value)
+#print(lines_per_night)
+
+sentences_per_night = [] #list of the sentences per night
+for value in dict.values(sentence_dic_nights):
+	sentences_per_night.append(value)
+#print(characters_per_night)
+
+words_per_night = [] #list of the words per night
+for value in dict.values(word_dic_nights):
+	words_per_night.append(value)
+#print(words_per_night)
+
+list = [] #create a list with the numbers of the nights so from 1 up to 990
+calc = 1
+while int(calc) < 991:
+    list.append(calc)
+    calc = int(calc) + 1
+#print(list)
