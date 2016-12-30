@@ -187,9 +187,32 @@ for value in dict.values(word_dic_nights):
 	words_per_night.append(value)
 #print(words_per_night)
 
-list = [] #create a list with the numbers of the nights so from 1 up to 990
+nights = [] #create a list with the numbers of the nights so from 1 up to 990
 calc = 1
 while int(calc) < 991:
-    list.append(calc)
+    nights.append(calc)
     calc = int(calc) + 1
-print(list)
+#print(nights)
+
+#create table with all the data
+import numpy as np
+import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
+column1 = nights
+column2 = characters_per_night
+column3 = lines_per_night
+column4 = sentences_per_night
+column5 = words_per_night
+
+df = pd.DataFrame({'Nights': column1,'Total characters': column2,'Total lines': column3, 'Total sentences': column4,'Total words': column5})
+print(df)
+
+print(df.to_csv('datatable_allnights.csv'))
+
+from prettytable import PrettyTable
+#x = PrettyTable()
+def format_for_print(df):    
+    table = PrettyTable([''] + list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row)
+    return str(table)
+    #print(format_for_print(df))
