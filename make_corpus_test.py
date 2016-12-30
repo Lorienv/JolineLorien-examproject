@@ -206,7 +206,7 @@ column5 = words_per_night
 df = pd.DataFrame({'Nights': column1,'Total characters': column2,'Total lines': column3, 'Total sentences': column4,'Total words': column5})
 print(df)
 
-print(df.to_csv('datatable_allnights.csv'))
+#print(df.to_csv('datatable_allnights.csv'))
 
 from prettytable import PrettyTable
 #x = PrettyTable()
@@ -216,3 +216,5 @@ def format_for_print(df):
         table.add_row(row)
     return str(table)
     #print(format_for_print(df))
+
+import gensim
