@@ -58,7 +58,7 @@ for volume in corpus:
 # I made a new corpus of the volumes using the nltk PlaintextCorpusReader
 # which has some easy tools that can split a text into a list of words or sentences.
 
-	from nltk.corpus import PlaintextCorpusReader
+from nltk.corpus import PlaintextCorpusReader
 corpus_root= 'data'
 volumes = PlaintextCorpusReader(corpus_root, 'arabian.*')
 
@@ -270,7 +270,7 @@ pattern = re.compile(r'\s[Nn]ight')
 for volume in read_corpus:
 	indexes_night = start_and_end_index_nights(volume)
 	for i in indexes_night:
-		sentence = volume[i[0]+12:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
+		sentence = volume[i[0]+12:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. 'second') is included in 'sentence'
 		sentence = pattern.split(sentence)	
 		filename = 'data/'+ str(sentence[0]) + '.txt'
 		f = open(filename,'wt', encoding='utf-8')
@@ -288,14 +288,14 @@ for volume in read_corpus:
 #Each time, I will also have to make a list. These will then be used to visualise the statistics. 
 
 pattern = re.compile(r'[Tt]he')
-def corpus_nights(directory): #I slightly changed the function used to make a corpus of the ten volumes
+def corpus(directory): #I slightly changed the function used to make a corpus of the ten volumes
 	nights = []
 	for night in listdir(directory):
 		if pattern.search(night):
 			nights.append(directory + '/' + night)
 	return nights
 
-corpus_nights = corpus_nights('data')
+corpus_nights = corpus('data')
 print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
 
 #How many characters does each night have? 
@@ -405,5 +405,51 @@ print(df)
         #table.add_row(row)
     #return str(table)
     #print(format_for_print(df))
-  
+
+#######################################
+#Prepare the texts for topic modelling
+#######################################
+# First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
+
+pattern = re.compile(r'[Tt]he') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
+corpus_tales = []
+for file in listdir('data'):
+	if pattern.search(file):
+		corpus_tales.append('data' + '/' + file)
+print(len(corpus_tales)) #990 files are in the corpus (voorlopig)
+
+#Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords and save them in 'clean_doc'.
+import string
+punc = string.punctuation #import a list of punctuation
+from nltk.corpus import stopwords #import a list of stopwords
+stoplist = stopwords.words('english')
+additional_punc = ['``','--', "''"] #this is punctuation that might be in some tales, but is not in the punctuation list of nltk
+import nltk #import nltk to be able to use the tokenizer
+
+for tale in corpus_tales:
+	filtered_text = []
+	f = open(tale,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = text.lower()
+	text = nltk.word_tokenize(text)
+	for item in text:
+		if item in punc:
+			continue
+		if item in additional_punc:
+			continue	
+		if item in stoplist:
+			continue
+		filtered_text.append(item)	
+	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
+	f_out = open(filename,'wt', encoding='utf-8')
+	f_out.write(' '.join(filtered_text))
+
+
+
+
+
+
+
+
   
