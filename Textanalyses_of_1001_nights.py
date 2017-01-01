@@ -13,7 +13,7 @@ def list_10_volumes(directory):
 	return volumes
 
 corpus = list_10_volumes('data')
-print(corpus)
+#print(corpus)
 
 # How many characters does each volume in the corpus have? 
 # and how many characters does the entire corpus have?
@@ -28,7 +28,7 @@ def calculate_characters(corpus):
 		counter+= len(text)
 	return characters_per_volume, 'Together, the ten volumes have ' + str(counter) + ' characters.'
 
-print(calculate_characters(corpus))	
+#print(calculate_characters(corpus))	
 
 # How many lines does the entire corpus have?
 def calculate_lines(corpus):
@@ -38,9 +38,9 @@ def calculate_lines(corpus):
 		for line in f:
 			count += 1
 		f.close()	
-	print('The corpus of ten volumes has ' + str(count) + ' lines.')	
+	#print('The corpus of ten volumes has ' + str(count) + ' lines.')	
 			
-print(calculate_lines(corpus))	
+#print(calculate_lines(corpus))	
 
 # How many lines does each volume have?
 def calculate_lines_II(file):
@@ -52,27 +52,27 @@ def calculate_lines_II(file):
 	return [file, ' has ', count, 'lines.']
 
 for volume in corpus: 
-	print(calculate_lines_II(volume))		
+	#print(calculate_lines_II(volume))		
 
 # In order to calculate the amount of words and sentences in each volume,
 # I made a new corpus of the volumes using the nltk PlaintextCorpusReader
 # which has some easy tools that can split a text into a list of words or sentences.
 
-from nltk.corpus import PlaintextCorpusReader
+	from nltk.corpus import PlaintextCorpusReader
 corpus_root= 'data'
 volumes = PlaintextCorpusReader(corpus_root, 'arabian.*')
 
 list_of_sentences = volumes.sents()
-print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
+#print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
 
 list_of_words = volumes.words()
-print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
+#print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
 
 for item in volumes.fileids(): #calculate the amount of words in each volume
-	print(item,':', len(volumes.words(item)), 'words')
+	#print(item,':', len(volumes.words(item)), 'words')
 
-for item in volumes.fileids(): #calculate the amount of sentences in each volume
-	print(item,':', len(volumes.sents(item)), 'sentences')	
+	for item in volumes.fileids(): #calculate the amount of sentences in each volume
+		print(item,':', len(volumes.sents(item)), 'sentences')	
 
 ##################################################################
 #visualization of the statistiscs with basic plotting techniques
@@ -83,13 +83,7 @@ import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
 #visualize the characters per volume
-#make a list of the total characters per volume ---> lijst maken van de counters die def(calculate_characters) teruggeeft
-#characters_per_volume= []
-#for volume in corpus:
-	#characters_per_volume.append(calculate_characters(corpus)) #ik weet niet hoe ik hier een lijst van kan maken
-#dit klopt niet, de aparte counters zonder tekst komen niet in een lijst, wel de tekst en de counters
-#print(characters_per_volume)
-
+#make a list of the total characters per volume -
 characters_per_volume = (calculate_characters(corpus))[0]
 x = [1,2,3,4,5,6,7,8,9,10]
 y = characters_per_volume
@@ -107,14 +101,14 @@ def autolabel(rects):# attach labels above bars #zoals gevonden op matplotlib si
                 ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
         #and the number that is put on top of each column is written by: '%d' %int(height). 
         #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
-print(autolabel(rects1))
+#print(autolabel(rects1))
 
 plt.bar(x,y) #plot a bar chart and attach some information to it
 plt.title("total number of characters in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
-plt.show()
+#plt.show()
 
 #visualize the lines per volume
 #make a list of the total lines per volume ---> lijst maken van de counters die def(calculate_lines_II(volume)) teruggeeft 
@@ -138,20 +132,20 @@ def autolabel(rects):# attach labels above bars as recommanded by the matplotlib
                 ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
         #and the number that is put on top of each column is written by: '%d' %int(height). 
         #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
-print(autolabel(rects2))
+#print(autolabel(rects2))
 
 plt.bar(x,y) #plot a bar chart and attach some information to it
 plt.title("total number of lines in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of lines")
 plt.xticks(x,x_labels)
-plt.show()
+#plt.show()
 
 #visualize the sentences per volume
 sentences_per_volume = []
 for item in volumes.fileids():
 	sentences_per_volume.append(len(volumes.sents(item)))
-print(sentences_per_volume)
+#print(sentences_per_volume)
 
 x = [1,2,3,4,5,6,7,8,9,10]
 y = sentences_per_volume
@@ -169,21 +163,21 @@ def autolabel(rects):# attach labels above bars as recommanded by the matplotlib
                 ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
         #and the number that is put on top of each column is written by: '%d' %int(height). 
         #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
-print(autolabel(rects1))
+#print(autolabel(rects1))
 
 plt.bar(x,y) #plot a bar chart and attach some information to it
 plt.title("total number of sentences in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of sentences")
 plt.xticks(x,x_labels)
-plt.show()
+#plt.show()
 
 
 #visualize the words per volume
 words_per_volume = []
 for item in volumes.fileids():
 	words_per_volume.append(len(volumes.words(item)))
-print(words_per_volume)
+#print(words_per_volume)
 
 x = [1,2,3,4,5,6,7,8,9,10]
 y = words_per_volume
@@ -201,14 +195,14 @@ def autolabel(rects):# attach labels above bars as recommanded by the matplotlib
                 ha='center', va='bottom') #The placement of the text is determined by the height function, or the height of the column
         #and the number that is put on top of each column is written by: '%d' %int(height). 
         #So all you need to do is create an array of strings that you want at the top of the columns and iterate through. 
-print(autolabel(rects1))
+#print(autolabel(rects1))
 
 plt.bar(x,y) #plot a bar chart and attach some information to it
 plt.title("total number of words in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of words")
 plt.xticks(x,x_labels)
-plt.show()
+#plt.show()
 
 #visualize all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
 import texttable as tt#import texttable module
@@ -231,7 +225,7 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 #intersection points of these lines and the header line, in that order
 
 table_statistics = tab.draw()#table is returned as a string
-print(table_statistics)
+#print(table_statistics)
 
 ##################################
 #Separate the volumes into nights
@@ -268,18 +262,18 @@ def start_and_end_index_nights(volume):
 counter = 0
 for volume in read_corpus:
 	counter+= (len(start_and_end_index_nights(volume)))
-print(counter) # It seems there are only 990 nights in the ten volumes, or at least, 990 nights are extracted. 
+#print(counter) # It seems there are only 990 nights in the ten volumes, or at least, 990 nights are extracted. 
 
 #Now we put each night into a separate file using the indexes calculated above.
 
-for volume in read_corpus:
-	indexes_night = start_and_end_index_nights(volume)
-	for i in indexes_night:
-		sentence = volume[i[0]+15:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
-		sentence = sentence.split(',')	
-		filename = 'data/'+ str("".join(sentence[0])) + '.txt'
-		f = open(filename,'wt', encoding='utf-8')
-		f.write(volume[i[0]:i[1]])
+#for volume in read_corpus:
+	#indexes_night = start_and_end_index_nights(volume)
+	#for i in indexes_night:
+		#sentence = volume[i[0]+15:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
+		#sentence = sentence.split(',')	
+		#filename = 'data/'+ str("".join(sentence[0])) + '.txt'
+		#f = open(filename,'wt', encoding='utf-8')
+		#f.write(volume[i[0]:i[1]])
 
 #There are a few files that have a name like ' Eight Hundred and Thirty-sixth Night \n\n She said', because 'she said' stood befor the comma
 #I tried to solve it by doing this, but it didn't work. I don't know why though...
@@ -309,7 +303,8 @@ def corpus_nights(directory): #I slightly changed the function used to make a co
 
 corpus_nights = corpus_nights('data')
 
-#How many characters does each night have? 
+#How many characters does each night have? #problem: we have to sort the dictionaries, maybe with ordereddict
+import collections
 def calculate_characters_nights(corpus):
 	characters_per_night = {}
 	for night in corpus:
@@ -317,9 +312,11 @@ def calculate_characters_nights(corpus):
 		text = f.read()
 		f.close()
 		characters_per_night[night] = len(text)
+		characters_per_night = collections.OrderedDict(characters_per_night) #we make sure that the order of the data stays the same
 	return characters_per_night
 
 char_dict_night = calculate_characters_nights(corpus_nights)
+#print(char_dict_night)
 
 #How many lines does each night have?
 def calculate_lines_night(file):
@@ -333,20 +330,82 @@ def calculate_lines_night(file):
 line_dict_nights = {}
 for night in corpus_nights:
 	line_dict_nights[night] = calculate_lines_night(night)
-print(line_dict_nights)	
+	line_dict_nights = collections.OrderedDict(line_dict_nights) ##we make sure that the order of the data stays the same
+	#return characters_per_night
+#print(line_dict_nights)	
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
 corpus_nightsII = PlaintextCorpusReader(corpus_root, '.*[nN]ight.txt')	
-print(len(corpus_nightsII.fileids())) 
+#print(len(corpus_nightsII.fileids())) 
 
+#vanaf hier loopt het mis, de lijsten veranderen toch nog van volgorde
 word_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of words in each volume
 	word_dic_nights[file] = len(corpus_nightsII.words(file))
+	word_dic_nights = collections.OrderedDict(word_dic_nights) #we make sure that the order of the data stays the same
+	#return characters_per_night
+#print(word_dic_nights)
 
 sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
+	#return characters_per_night
+#print(sentence_dic_nights)
 
+#####################################
+#visualize statistics for each night
+##################################### 
 
+#collect data for table with total numbers for each night
 
+characters_per_night = [] #list of the characters per night
+for value in dict.values(char_dict_night):
+	characters_per_night.append(value)
+print(characters_per_night)
+
+lines_per_night = [] #list of the lines per night
+for value in dict.values(line_dict_nights):
+	lines_per_night.append(value)
+#print(lines_per_night)
+
+sentences_per_night = [] #list of the sentences per night
+for value in dict.values(sentence_dic_nights):
+	sentences_per_night.append(value)
+#print(sentences_per_night)
+
+words_per_night = [] #list of the words per night
+for value in dict.values(word_dic_nights):
+	words_per_night.append(value)
+#print(words_per_night)
+
+nights = [] #create a list with the numbers of the nights so from 1 up to 990 #problem with order of data, so need to find other solution
+calc = 1
+while int(calc) < 991:
+    nights.append(calc)
+    calc = int(calc) + 1
+#print(nights)
+
+#create table with all the data
+import numpy as np
+import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
+column1 = nights
+column2 = characters_per_night
+column3 = lines_per_night
+column4 = sentences_per_night
+column5 = words_per_night
+
+df = pd.DataFrame({'Nights': column1,'Total characters': column2,'Total lines': column3, 'Total sentences': column4,'Total words': column5})
+print(df)
+
+#print(df.to_csv('datatable_allnights.csv')) #turn data frame table into cvs-file, I get a file but it is messed up
+
+#from prettytable import PrettyTable #not sure yet of this is the best way to visualize the dataframe, i will think about this
+#x = PrettyTable()
+#def format_for_print(df):    
+    #table = PrettyTable([''] + list(df.columns))
+    #for row in df.itertuples():
+        #table.add_row(row)
+    #return str(table)
+    #print(format_for_print(df))
