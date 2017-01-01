@@ -13,7 +13,7 @@ def list_10_volumes(directory):
 	return volumes
 
 corpus = list_10_volumes('data')
-#print(corpus)
+print(corpus)
 
 # How many characters does each volume in the corpus have? 
 # and how many characters does the entire corpus have?
@@ -28,7 +28,7 @@ def calculate_characters(corpus):
 		counter+= len(text)
 	return characters_per_volume, 'Together, the ten volumes have ' + str(counter) + ' characters.'
 
-#print(calculate_characters(corpus))	
+print(calculate_characters(corpus))	
 
 # How many lines does the entire corpus have?
 def calculate_lines(corpus):
@@ -38,9 +38,9 @@ def calculate_lines(corpus):
 		for line in f:
 			count += 1
 		f.close()	
-	#print('The corpus of ten volumes has ' + str(count) + ' lines.')	
+	print('The corpus of ten volumes has ' + str(count) + ' lines.')	
 			
-#print(calculate_lines(corpus))	
+print(calculate_lines(corpus))	
 
 # How many lines does each volume have?
 def calculate_lines_II(file):
@@ -52,7 +52,7 @@ def calculate_lines_II(file):
 	return [file, ' has ', count, 'lines.']
 
 for volume in corpus: 
-	#print(calculate_lines_II(volume))		
+	print(calculate_lines_II(volume))		
 
 # In order to calculate the amount of words and sentences in each volume,
 # I made a new corpus of the volumes using the nltk PlaintextCorpusReader
@@ -63,26 +63,26 @@ corpus_root= 'data'
 volumes = PlaintextCorpusReader(corpus_root, 'arabian.*')
 
 list_of_sentences = volumes.sents()
-#print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
+print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
 
 list_of_words = volumes.words()
-#print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
+print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
 
 for item in volumes.fileids(): #calculate the amount of words in each volume
-	#print(item,':', len(volumes.words(item)), 'words')
+	print(item,':', len(volumes.words(item)), 'words')
 
-	for item in volumes.fileids(): #calculate the amount of sentences in each volume
-		print(item,':', len(volumes.sents(item)), 'sentences')	
+for item in volumes.fileids(): #calculate the amount of sentences in each volume
+	print(item,':', len(volumes.sents(item)), 'sentences')	
 
 ##################################################################
-#visualization of the statistiscs with basic plotting techniques
+#visualisation of the statistiscs with basic plotting techniques
 ##################################################################
 
 import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
-#visualize the characters per volume
+#visualise the characters per volume
 #make a list of the total characters per volume -
 characters_per_volume = (calculate_characters(corpus))[0]
 x = [1,2,3,4,5,6,7,8,9,10]
@@ -110,7 +110,7 @@ plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
 #plt.show()
 
-#visualize the lines per volume
+#visualise the lines per volume
 #make a list of the total lines per volume ---> lijst maken van de counters die def(calculate_lines_II(volume)) teruggeeft 
 lines_per_volume = []
 for volume in corpus: 
@@ -141,7 +141,7 @@ plt.ylabel("# of lines")
 plt.xticks(x,x_labels)
 #plt.show()
 
-#visualize the sentences per volume
+#visualise the sentences per volume
 sentences_per_volume = []
 for item in volumes.fileids():
 	sentences_per_volume.append(len(volumes.sents(item)))
@@ -173,7 +173,7 @@ plt.xticks(x,x_labels)
 #plt.show()
 
 
-#visualize the words per volume
+#visualise the words per volume
 words_per_volume = []
 for item in volumes.fileids():
 	words_per_volume.append(len(volumes.words(item)))
@@ -204,7 +204,7 @@ plt.ylabel("# of words")
 plt.xticks(x,x_labels)
 #plt.show()
 
-#visualize all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
+#visualise all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
 import texttable as tt#import texttable module
 tab = tt.Texttable() #initialize texttable object
 
@@ -266,24 +266,18 @@ for volume in read_corpus:
 
 #Now we put each night into a separate file using the indexes calculated above.
 
-#for volume in read_corpus:
-	#indexes_night = start_and_end_index_nights(volume)
-	#for i in indexes_night:
-		#sentence = volume[i[0]+15:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
-		#sentence = sentence.split(',')	
-		#filename = 'data/'+ str("".join(sentence[0])) + '.txt'
-		#f = open(filename,'wt', encoding='utf-8')
-		#f.write(volume[i[0]:i[1]])
+pattern = re.compile(r'\s[Nn]ight')
+for volume in read_corpus:
+	indexes_night = start_and_end_index_nights(volume)
+	for i in indexes_night:
+		sentence = volume[i[0]+12:i[0]+150] #150 is just a random number, it makes sure that the first sentence (starting from the number e.g. second) is included in 'sentence'
+		sentence = pattern.split(sentence)	
+		filename = 'data/'+ str(sentence[0]) + '.txt'
+		f = open(filename,'wt', encoding='utf-8')
+		f.write(volume[i[0]:i[1]])
 
-#There are a few files that have a name like ' Eight Hundred and Thirty-sixth Night \n\n She said', because 'she said' stood befor the comma
-#I tried to solve it by doing this, but it didn't work. I don't know why though...
-
-#import os
-#import re
-#pattern = re.compile(r'\n*[Ss]he said')
-#for fileName in os.listdir('data'):
-#	if pattern.search(fileName):
-#		os.rename(fileName, pattern.sub('', fileName))
+#I now created 990 files and each file has a name like 'the second', 'the the Four Hundred and Sixty-third',...
+#This is important so that we know which night we are talking about.
 
 #####################################
 #Calculate statistics for each night
@@ -291,32 +285,35 @@ for volume in read_corpus:
 
 #Make a new corpus, consisting of the nights so statistics can be calculated
 #Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
+#Each time, I will also have to make a list. These will then be used to visualise the statistics. 
 
-#I now manually changed the names of those files who were named wrong in order to create a corpus
-
+pattern = re.compile(r'[Tt]he')
 def corpus_nights(directory): #I slightly changed the function used to make a corpus of the ten volumes
 	nights = []
 	for night in listdir(directory):
-		if night.endswith('ight.txt'):
+		if pattern.search(night):
 			nights.append(directory + '/' + night)
 	return nights
 
 corpus_nights = corpus_nights('data')
+print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
 
-#How many characters does each night have? #problem: we have to sort the dictionaries, maybe with ordereddict
+#How many characters does each night have? 
 import collections
 def calculate_characters_nights(corpus):
 	characters_per_night = {}
+	characters_per_night_list = []
 	for night in corpus:
 		f = open(night, 'rt', encoding='utf-8') 
 		text = f.read()
 		f.close()
 		characters_per_night[night] = len(text)
+		characters_per_night_list.append((night,len(text)))
 		characters_per_night = collections.OrderedDict(characters_per_night) #we make sure that the order of the data stays the same
-	return characters_per_night
+	return characters_per_night, characters_per_night_list
 
-char_dict_night = calculate_characters_nights(corpus_nights)
-#print(char_dict_night)
+char_dict_night = (calculate_characters_nights(corpus_nights))[0]
+char_list_night = (calculate_characters_nights(corpus_nights))[1]
 
 #How many lines does each night have?
 def calculate_lines_night(file):
@@ -327,57 +324,56 @@ def calculate_lines_night(file):
 	f.close()
 	return count
 
+line_list_nights = []
 line_dict_nights = {}
 for night in corpus_nights:
+	line_list_nights.append((night, calculate_lines_night(night)))
 	line_dict_nights[night] = calculate_lines_night(night)
-	line_dict_nights = collections.OrderedDict(line_dict_nights) ##we make sure that the order of the data stays the same
-	#return characters_per_night
-#print(line_dict_nights)	
+	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same	
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
-corpus_nightsII = PlaintextCorpusReader(corpus_root, '.*[nN]ight.txt')	
-#print(len(corpus_nightsII.fileids())) 
+corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he.*')	
+print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
-#vanaf hier loopt het mis, de lijsten veranderen toch nog van volgorde
 word_dic_nights = {}
+word_list_nights = []
 for file in corpus_nightsII.fileids(): #calculate the amount of words in each volume
+	word_list_nights.append((file, len(corpus_nightsII.words(file))))
 	word_dic_nights[file] = len(corpus_nightsII.words(file))
 	word_dic_nights = collections.OrderedDict(word_dic_nights) #we make sure that the order of the data stays the same
-	#return characters_per_night
-#print(word_dic_nights)
 
+sentence_list_nights = []
 sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
+	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
 	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
-	#return characters_per_night
-#print(sentence_dic_nights)
 
 #####################################
-#visualize statistics for each night
+#visualise statistics for each night
 ##################################### 
 
 #collect data for table with total numbers for each night
 
 characters_per_night = [] #list of the characters per night
-for value in dict.values(char_dict_night):
-	characters_per_night.append(value)
-print(characters_per_night)
+for tuples in char_list_night:
+	characters_per_night.append(tuples[1])	
+#print(characters_per_night)
 
 lines_per_night = [] #list of the lines per night
-for value in dict.values(line_dict_nights):
-	lines_per_night.append(value)
+for tuples in line_list_nights:
+	lines_per_night.append(tuples[1])
 #print(lines_per_night)
 
 sentences_per_night = [] #list of the sentences per night
-for value in dict.values(sentence_dic_nights):
-	sentences_per_night.append(value)
+for tuples in sentence_list_nights:
+	sentences_per_night.append(tuples[1])
 #print(sentences_per_night)
 
 words_per_night = [] #list of the words per night
-for value in dict.values(word_dic_nights):
-	words_per_night.append(value)
+for tuples in word_list_nights:
+	words_per_night.append(tuples[1])
 #print(words_per_night)
 
 nights = [] #create a list with the numbers of the nights so from 1 up to 990 #problem with order of data, so need to find other solution
@@ -409,3 +405,5 @@ print(df)
         #table.add_row(row)
     #return str(table)
     #print(format_for_print(df))
+  
+  
