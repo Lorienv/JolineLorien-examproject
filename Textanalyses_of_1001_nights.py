@@ -337,7 +337,7 @@ sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
-	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same'''
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
 
 #####################################
 #visualise statistics for each night
@@ -345,7 +345,7 @@ for file in corpus_nightsII.fileids(): #calculate the amount of sentences in eac
 
 #collect data for table with total numbers for each night
 
-characters_per_night = [] #list of the characters per night
+'''characters_per_night = [] #list of the characters per night
 for tuples in char_list_night:
 	characters_per_night.append(tuples[1])	
 print(characters_per_night)
@@ -367,9 +367,9 @@ for tuples in word_list_nights:
 
 number_nights = [] #create a list with the names of the nights, this is in the order from the dictionaries so not chronological
 for name in corpus_nightsII.fileids():
-	number_nights.append(name[5:-4])#remove the extension from the file name
-#print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
-'''
+	number_nights.append(name[:-4])#remove the extension from the file name
+print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
+
 #create table with all the data
 import numpy as np
 import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
@@ -380,30 +380,43 @@ column4 = sentences_per_night
 column5 = words_per_night
 
 df = pd.DataFrame({'Nights': column1,'Total characters': column2,'Total lines': column3, 'Total sentences': column4,'Total words': column5})
-print(df)
+#print(df) #show the data frame
 
-#print(df.to_csv('datatable_allnights.csv')) #turn data frame table into cvs-file, I get a file but it is messed up
+from pandas import ExcelWriter as xlwt #import excelwriter module
+from xlwt import Workbook
+writer = xlwt('table of all nights.xlsx') #create an excel file from the data frame
+workbook = writer.book #define the excel workbook
+df.to_excel(writer, 'Sheet1') #place the data frame on the first sheet of the excel file
+worksheet = writer.sheets['Sheet1'] #define the worksheet
+worksheet.set_column('B:F',35) #set the column width for columns B up to F, so we can see all the text in the cells
+format = workbook.add_format({'bold': True, 'font_color': 'red'}) #put in bold and red the night with the highest number of char., lines, sents. and words
 
-#from prettytable import PrettyTable #not sure yet of this is the best way to visualize the dataframe, i will think about this
-#x = PrettyTable()
-#def format_for_print(df):    
-    #table = PrettyTable([''] + list(df.columns))
-    #for row in df.itertuples():
-        #table.add_row(row)
-    #return str(table)
-    #print(format_for_print(df))
+#find the highest numbers per column (per list)
+print(max(characters_per_night))
+print(max(lines_per_night))
+print(max(sentences_per_night))
+print(max(words_per_night))
+
+worksheet.write('C31', '51841' , format) #highlight the night with the highest number of characters
+worksheet.write('D31', '864' , format) #highlight the night with the highest number of lines
+worksheet.write('E31', '399' , format) #highlight the night with the highest number of sentences
+worksheet.write('F31', '11794' , format) #highlight the night with the highest number of words
+worksheet.write('B31', 'the Eight Hundred and Forty-fifth', format)#highlight the name of the night with the highest numbers
+writer.save() #save and close the excel file
+
+#now the general visualisations of the statistics are finished, we can start preparing the texts for topic modeling '''
 
 #######################################
-#Prepare the texts for topic modelling
+#Prepare the texts for topic modeling
 #######################################
 # First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
 
-pattern = re.compile(r'[Tt]he\s') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
+pattern = re.compile(r'[Tt]he') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
 corpus_tales = []
 for file in listdir('data'):
 	if pattern.search(file):
 		corpus_tales.append('data' + '/' + file)
-print(len(corpus_tales)) #990 files are in the corpus (voorlopig)
+print(len(corpus_tales)) #for topic modeling we should have a minimum of 1000 files, now we have 1030 files
 
 #Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords and save them in 'clean_doc'.
 import string
@@ -432,7 +445,7 @@ for tale in corpus_tales:
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
-'''
+
 
 
 
