@@ -111,26 +111,34 @@ for volume in read_corpus:
 
 #I now manually changed the names of those files who were named wrong in order to create a corpus
 
-def corpus_nights(directory): #I slightly changed the function used to make a corpus of the ten volumes
+pattern = re.compile(r'[Tt]he\s')
+def corpus(directory): #I slightly changed the function used to make a corpus of the ten volumes
 	nights = []
 	for night in listdir(directory):
-		if night.endswith('ight.txt'):
+		if pattern.search(night):
 			nights.append(directory + '/' + night)
 	return nights
 
-corpus_nights = corpus_nights('data')
+corpus_nights = corpus('data')
+print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
+#print(corpus_nights)
 
 #How many characters does each night have? 
+import collections
 def calculate_characters_nights(corpus):
 	characters_per_night = {}
+	characters_per_night_list = []
 	for night in corpus:
 		f = open(night, 'rt', encoding='utf-8') 
 		text = f.read()
 		f.close()
 		characters_per_night[night] = len(text)
-	return characters_per_night
+		characters_per_night_list.append((night,len(text)))
+		characters_per_night = collections.OrderedDict(characters_per_night) #we make sure that the order of the data stays the same
+	return characters_per_night, characters_per_night_list
 
-char_dict_night = calculate_characters_nights(corpus_nights)
+char_dict_night = (calculate_characters_nights(corpus_nights))[0]
+char_list_night = (calculate_characters_nights(corpus_nights))[1]
 
 #How many lines does each night have?
 def calculate_lines_night(file):
@@ -141,63 +149,67 @@ def calculate_lines_night(file):
 	f.close()
 	return count
 
+line_list_nights = []
 line_dict_nights = {}
 for night in corpus_nights:
+	line_list_nights.append((night, calculate_lines_night(night)))
 	line_dict_nights[night] = calculate_lines_night(night)
-#print(line_dict_nights)	
+	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
-corpus_nightsII = PlaintextCorpusReader(corpus_root, '.*[nN]ight.txt')	
-#print(len(corpus_nightsII.fileids())) 
+corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
+#print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
 word_dic_nights = {}
+word_list_nights = []
 for file in corpus_nightsII.fileids(): #calculate the amount of words in each volume
+	word_list_nights.append((file, len(corpus_nightsII.words(file))))
 	word_dic_nights[file] = len(corpus_nightsII.words(file))
+	word_dic_nights = collections.OrderedDict(word_dic_nights) #we make sure that the order of the data stays the same
 
+sentence_list_nights = []
 sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
+	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
-
-
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same'''
 
 #####################################
-#visualize statistics for each night
+#visualise statistics for each night
 ##################################### 
 
 #collect data for table with total numbers for each night
 
 characters_per_night = [] #list of the characters per night
-for value in dict.values(char_dict_night):
-	characters_per_night.append(value)
+for tuples in char_list_night:
+	characters_per_night.append(tuples[1])	
 #print(characters_per_night)
 
 lines_per_night = [] #list of the lines per night
-for value in dict.values(line_dict_nights):
-	lines_per_night.append(value)
+for tuples in line_list_nights:
+	lines_per_night.append(tuples[1])
 #print(lines_per_night)
 
 sentences_per_night = [] #list of the sentences per night
-for value in dict.values(sentence_dic_nights):
-	sentences_per_night.append(value)
-#print(characters_per_night)
+for tuples in sentence_list_nights:
+	sentences_per_night.append(tuples[1])
+#print(sentences_per_night)
 
 words_per_night = [] #list of the words per night
-for value in dict.values(word_dic_nights):
-	words_per_night.append(value)
+for tuples in word_list_nights:
+	words_per_night.append(tuples[1])
 #print(words_per_night)
 
-nights = [] #create a list with the numbers of the nights so from 1 up to 990
-calc = 1
-while int(calc) < 991:
-    nights.append(calc)
-    calc = int(calc) + 1
-#print(nights)
+number_nights = [] #create a list with the names of the nights, this is in the order from the dictionaries so not chronological
+for name in corpus_nightsII.fileids():
+	number_nights.append(name[:-4])#remove the extension from the file name
+#print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
 
 #create table with all the data
 import numpy as np
 import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
-column1 = nights
+column1 = number_nights
 column2 = characters_per_night
 column3 = lines_per_night
 column4 = sentences_per_night
@@ -206,15 +218,62 @@ column5 = words_per_night
 df = pd.DataFrame({'Nights': column1,'Total characters': column2,'Total lines': column3, 'Total sentences': column4,'Total words': column5})
 print(df)
 
-#print(df.to_csv('datatable_allnights.csv'))
+#print(df.to_csv('datatable_allnights.csv')) #turn data frame table into cvs-file, I get a file but it is messed up
 
-from prettytable import PrettyTable
+#from prettytable import PrettyTable #not sure yet of this is the best way to visualize the dataframe, i will think about this
 #x = PrettyTable()
-def format_for_print(df):    
-    table = PrettyTable([''] + list(df.columns))
-    for row in df.itertuples():
-        table.add_row(row)
-    return str(table)
+#def format_for_print(df):    
+    #table = PrettyTable([''] + list(df.columns))
+    #for row in df.itertuples():
+        #table.add_row(row)
+    #return str(table)
     #print(format_for_print(df))
 
-import gensim
+#######################################
+#Prepare the texts for topic modelling
+#######################################
+# First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
+
+pattern = re.compile(r'[Tt]he\s') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
+corpus_tales = []
+for file in listdir('data'):
+	if pattern.search(file):
+		corpus_tales.append('data' + '/' + file)
+print(len(corpus_tales)) #990 files are in the corpus (voorlopig)
+
+#Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords and save them in 'clean_doc'.
+import string
+punc = string.punctuation #import a list of punctuation
+from nltk.corpus import stopwords #import a list of stopwords
+stoplist = stopwords.words('english')
+additional_punc = ['``','--', "''"] #this is punctuation that might be in some tales, but is not in the punctuation list of nltk
+import nltk #import nltk to be able to use the tokenizer
+
+for tale in corpus_tales:
+	filtered_text = []
+	f = open(tale,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = text.lower()
+	text = nltk.word_tokenize(text)
+	for item in text:
+		if item in punc:
+			continue
+		if item in additional_punc:
+			continue	
+		if item in stoplist:
+			continue
+		filtered_text.append(item)	
+	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
+	f_out = open(filename,'wt', encoding='utf-8')
+	f_out.write(' '.join(filtered_text))
+	f_out.close()
+
+
+
+
+
+
+
+
+  
