@@ -275,6 +275,7 @@ for volume in read_corpus:
 		filename = 'data/'+ str(sentence[0]) + '.txt'
 		f = open(filename,'wt', encoding='utf-8')
 		f.write(volume[i[0]:i[1]])
+		f.close()
 
 #I now created 990 files and each file has a name like 'the second', 'the the Four Hundred and Sixty-third',...
 #This is important so that we know which night we are talking about.
@@ -287,7 +288,7 @@ for volume in read_corpus:
 #Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
 #Each time, I will also have to make a list. These will then be used to visualise the statistics. 
 
-pattern = re.compile(r'[Tt]he')
+pattern = re.compile(r'[Tt]he\s')
 def corpus(directory): #I slightly changed the function used to make a corpus of the ten volumes
 	nights = []
 	for night in listdir(directory):
@@ -296,7 +297,7 @@ def corpus(directory): #I slightly changed the function used to make a corpus of
 	return nights
 
 corpus_nights = corpus('data')
-#print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
+print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
 #print(corpus_nights)
 
 #How many characters does each night have? 
@@ -334,7 +335,7 @@ for night in corpus_nights:
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
-corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he.*')	
+corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
 #print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
 word_dic_nights = {}
@@ -410,7 +411,7 @@ print(df)
 #######################################
 # First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
 
-pattern = re.compile(r'[Tt]he') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
+pattern = re.compile(r'[Tt]he\s') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
 corpus_tales = []
 for file in listdir('data'):
 	if pattern.search(file):
@@ -443,6 +444,7 @@ for tale in corpus_tales:
 	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
+	f_out.close()
 
 
 
