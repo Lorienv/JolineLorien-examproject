@@ -411,12 +411,12 @@ writer.save() #save and close the excel file
 #######################################
 # First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
 
-pattern = re.compile(r'[Tt]he') #Lorien, hier zal dus nog wat achter komen, afhankelijk van de namen van die andere sprookjes.
+pattern = re.compile(r'[Tt]he') 
 corpus_tales = []
 for file in listdir('data'):
 	if pattern.search(file):
 		corpus_tales.append('data' + '/' + file)
-print(len(corpus_tales)) #for topic modeling we should have a minimum of 1000 files, now we have 1030 files
+print(len(corpus_tales)) #for topic modeling we should have a minimum of 1000 files, now we have 1030 files (990 nights and some additional tales)
 
 #Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords and save them in 'clean_doc'.
 import string
@@ -440,7 +440,13 @@ for tale in corpus_tales:
 			continue	
 		if item in stoplist:
 			continue
-		filtered_text.append(item)	
+		filtered_text.append(item)
+	pos_text = nltk.pos_tag(filtered_text)
+	for tuples in pos_text: #this will remove modals and cardinal numbers
+		if tuples[1] == 'MD':
+			filtered_text.remove(tuples[0])
+		if tuples[1] == 'CD':
+			filtered_text.remove(tuples[0])			
 	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
