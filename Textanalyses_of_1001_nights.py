@@ -78,7 +78,7 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 #visualisation of the statistiscs with basic plotting techniques
 ##################################################################
 
-'''import matplotlib.pyplot as plt #pyhton library for plotting data
+import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
@@ -225,7 +225,7 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 #intersection points of these lines and the header line, in that order
 
 table_statistics = tab.draw()#table is returned as a string
-#print(table_statistics)'''
+#print(table_statistics)
 
 ##################################
 #Separate the volumes into nights
@@ -331,7 +331,7 @@ line_dict_nights = {}
 for night in corpus_nights:
 	line_list_nights.append((night, calculate_lines_night(night)))
 	line_dict_nights[night] = calculate_lines_night(night)
-	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same	
+	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
@@ -350,7 +350,7 @@ sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
-	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same'''
 
 #####################################
 #visualise statistics for each night
@@ -380,7 +380,7 @@ for tuples in word_list_nights:
 
 number_nights = [] #create a list with the names of the nights, this is in the order from the dictionaries so not chronological
 for name in corpus_nightsII.fileids():
-	number_nights.append(name[:-4])#remove the extension from the file name
+	number_nights.append(name[5:-4])#remove the extension from the file name
 #print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
 
 #create table with all the data
