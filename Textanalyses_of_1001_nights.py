@@ -52,7 +52,7 @@ def calculate_lines_II(file):
 	return [file, ' has ', count, 'lines.']
 
 for volume in corpus: 
-	print(calculate_lines_II(volume))		
+	print(calculate_lines_II(volume))	
 
 # In order to calculate the amount of words and sentences in each volume,
 # I made a new corpus of the volumes using the nltk PlaintextCorpusReader
@@ -78,7 +78,7 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 #visualisation of the statistiscs with basic plotting techniques
 ##################################################################
 
-import matplotlib.pyplot as plt #pyhton library for plotting data
+'''import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
@@ -225,7 +225,7 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 #intersection points of these lines and the header line, in that order
 
 table_statistics = tab.draw()#table is returned as a string
-#print(table_statistics)
+#print(table_statistics)'''
 
 ##################################
 #Separate the volumes into nights
@@ -296,7 +296,8 @@ def corpus(directory): #I slightly changed the function used to make a corpus of
 	return nights
 
 corpus_nights = corpus('data')
-print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
+#print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
+#print(corpus_nights)
 
 #How many characters does each night have? 
 import collections
@@ -334,7 +335,7 @@ for night in corpus_nights:
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
 corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he.*')	
-print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
+#print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
 word_dic_nights = {}
 word_list_nights = []
@@ -376,17 +377,15 @@ for tuples in word_list_nights:
 	words_per_night.append(tuples[1])
 #print(words_per_night)
 
-nights = [] #create a list with the numbers of the nights so from 1 up to 990 #problem with order of data, so need to find other solution
-calc = 1
-while int(calc) < 991:
-    nights.append(calc)
-    calc = int(calc) + 1
-#print(nights)
+number_nights = [] #create a list with the names of the nights, this is in the order from the dictionaries so not chronological
+for name in corpus_nightsII.fileids():
+	number_nights.append(name[:-4])#remove the extension from the file name
+#print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
 
 #create table with all the data
 import numpy as np
 import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
-column1 = nights
+column1 = number_nights
 column2 = characters_per_night
 column3 = lines_per_night
 column4 = sentences_per_night
