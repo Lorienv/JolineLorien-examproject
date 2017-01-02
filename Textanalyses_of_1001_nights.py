@@ -331,7 +331,7 @@ line_dict_nights = {}
 for night in corpus_nights:
 	line_list_nights.append((night, calculate_lines_night(night)))
 	line_dict_nights[night] = calculate_lines_night(night)
-	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same	
+	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same
 
 #to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
 corpus_root= 'data'
@@ -350,7 +350,7 @@ sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
-	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same'''
 
 #####################################
 #visualise statistics for each night
