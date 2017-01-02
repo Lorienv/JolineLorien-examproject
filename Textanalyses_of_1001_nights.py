@@ -77,7 +77,7 @@ for item in volumes.fileids(): #calculate the amount of sentences in each volume
 ##################################################################
 #visualisation of the statistiscs with basic plotting techniques
 ##################################################################
-
+'''
 import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
 #%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
@@ -226,7 +226,7 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 
 table_statistics = tab.draw()#table is returned as a string
 #print(table_statistics)
-
+'''
 ##################################
 #Separate the volumes into nights
 ##################################
@@ -288,17 +288,9 @@ for volume in read_corpus:
 #Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
 #Each time, I will also have to make a list. These will then be used to visualise the statistics. 
 
-pattern = re.compile(r'[Tt]he\s')
-def corpus(directory): #I slightly changed the function used to make a corpus of the ten volumes
-	nights = []
-	for night in listdir(directory):
-		if pattern.search(night):
-			nights.append(directory + '/' + night)
-	return nights
-
-corpus_nights = corpus('data')
-print(len(corpus_nights)) #to check whether all the nights are in the corpus. That is indeed the case.
-#print(corpus_nights)
+corpus_root= 'data'
+corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
+print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
 #How many characters does each night have? 
 import collections
@@ -306,7 +298,7 @@ def calculate_characters_nights(corpus):
 	characters_per_night = {}
 	characters_per_night_list = []
 	for night in corpus:
-		f = open(night, 'rt', encoding='utf-8') 
+		f = open('data/' + night, 'rt', encoding='utf-8') 
 		text = f.read()
 		f.close()
 		characters_per_night[night] = len(text)
@@ -314,13 +306,13 @@ def calculate_characters_nights(corpus):
 		characters_per_night = collections.OrderedDict(characters_per_night) #we make sure that the order of the data stays the same
 	return characters_per_night, characters_per_night_list
 
-char_dict_night = (calculate_characters_nights(corpus_nights))[0]
-char_list_night = (calculate_characters_nights(corpus_nights))[1]
+char_dict_night = (calculate_characters_nights(corpus_nightsII.fileids()))[0]
+char_list_night = (calculate_characters_nights(corpus_nightsII.fileids()))[1]
 
 #How many lines does each night have?
 def calculate_lines_night(file):
 	count = 0
-	f = open (file, 'rt', encoding='utf-8') 
+	f = open ('data/' + file, 'rt', encoding='utf-8') 
 	for line in f:
 		count += 1
 	f.close()
@@ -328,15 +320,10 @@ def calculate_lines_night(file):
 
 line_list_nights = []
 line_dict_nights = {}
-for night in corpus_nights:
+for night in corpus_nightsII.fileids():
 	line_list_nights.append((night, calculate_lines_night(night)))
 	line_dict_nights[night] = calculate_lines_night(night)
 	line_dict_nights = collections.OrderedDict(line_dict_nights) #we make sure that the order of the data stays the same
-
-#to calculate the amount of words and sentences, I again made a corpus using the PlaintextCorpusReader
-corpus_root= 'data'
-corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
-#print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
 
 word_dic_nights = {}
 word_list_nights = []
@@ -361,12 +348,12 @@ for file in corpus_nightsII.fileids(): #calculate the amount of sentences in eac
 characters_per_night = [] #list of the characters per night
 for tuples in char_list_night:
 	characters_per_night.append(tuples[1])	
-#print(characters_per_night)
+print(characters_per_night)
 
 lines_per_night = [] #list of the lines per night
 for tuples in line_list_nights:
 	lines_per_night.append(tuples[1])
-#print(lines_per_night)
+print(lines_per_night)
 
 sentences_per_night = [] #list of the sentences per night
 for tuples in sentence_list_nights:
@@ -382,7 +369,7 @@ number_nights = [] #create a list with the names of the nights, this is in the o
 for name in corpus_nightsII.fileids():
 	number_nights.append(name[5:-4])#remove the extension from the file name
 #print(number_nights) #Here we discovered that there is a fault in a file. The first line of the story is 'The Hundred and and night', so we actually don't know which number it is
-
+'''
 #create table with all the data
 import numpy as np
 import pandas as pd #import panda so we can turn the data into a data table with pandas dataframe
@@ -445,7 +432,7 @@ for tale in corpus_tales:
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
-
+'''
 
 
 
