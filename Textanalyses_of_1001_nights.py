@@ -463,9 +463,13 @@ for tale in corpus_tales:
 	f_out.close()
 
 
-
-
-
+# now we make a new corpus consisting of the filtered texts
+pattern = re.compile(r'.*') 
+clean_corpus= []
+for file in listdir('clean_doc'):
+	if pattern.search(file):
+		clean_corpus.append('clean_doc' + '/' + file)
+print(len(clean_corpus))
 
 
 
