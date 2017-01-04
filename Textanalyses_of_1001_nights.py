@@ -283,7 +283,7 @@ for volume in read_corpus:
 #####################################
 #Calculate statistics for each night
 #####################################   	
-
+'''
 #Make a new corpus, consisting of the nights so statistics can be calculated
 #Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
 #Each time, I will also have to make a list. These will then be used to visualise the statistics. 
@@ -338,7 +338,7 @@ for file in corpus_nightsII.fileids(): #calculate the amount of sentences in eac
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
 	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
-
+'''
 #####################################
 #visualise statistics for each night
 ##################################### 
@@ -418,13 +418,19 @@ for file in listdir('data'):
 		corpus_tales.append('data' + '/' + file)
 print(len(corpus_tales)) #for topic modeling we should have a minimum of 1000 files, now we have 1030 files (990 nights and some additional tales)
 
-#Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords and save them in 'clean_doc'.
+#Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords, words that occur only once
+# modals, cardinal numbers... and save them in 'clean_doc'.
 import string
 punc = string.punctuation #import a list of punctuation
 from nltk.corpus import stopwords #import a list of stopwords
 stoplist = stopwords.words('english')
 additional_punc = ['``','--', "''"] #this is punctuation that might be in some tales, but is not in the punctuation list of nltk
 import nltk #import nltk to be able to use the tokenizer
+from nltk.stem.porter import PorterStemmer
+p_stemmer = PorterStemmer()
+from collections import defaultdict
+frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
+
 
 for tale in corpus_tales:
 	filtered_text = []
@@ -446,11 +452,17 @@ for tale in corpus_tales:
 		if tuples[1] == 'MD':
 			filtered_text.remove(tuples[0])
 		if tuples[1] == 'CD':
-			filtered_text.remove(tuples[0])			
+			filtered_text.remove(tuples[0])	
+	filtered_text = [p_stemmer.stem(i) for i in filtered_text] #the words are stemmed. We noticed that some words turned into a rather strange stem and we don't know whether that is how it should be.				
+	for words in filtered_text:
+		frequency[words] += 1
+	filtered_text = [words for words in filtered_text if frequency[words] > 1] #now only words that occur more than once are in 'filtered_text'	
 	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
+
+
 
 
 
