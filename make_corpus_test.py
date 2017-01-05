@@ -59,20 +59,17 @@ for tale in corpus_tales:
 import gensim
 from gensim import corpora, models, similarities
 
-class MyCorpus(gensim.corpora.TextCorpus):
-    def get_texts(self):
-        for filename in self.input: # for each relevant file
-            yield tokenize(open('clean_doc').read()) 
-            print(get_texts(self))
-            
+from gensim import corpora
+texts = filtered_text #hebben we al gedaan met cleanen, dus ik denk dat wij meteen ‘tekst =’ kunnen doen
+print(texts)
 
-corpus_memory_friendly = MyCorpus()  # doesn't load the corpus into memory!
-#print(corpus_memory_friendly)
-#print(MyCorpus.dictionary.token2id.items())
-#for vector in corpus_memory_friendly:  # load one vector into memory at a time
-	#print(vector)
 
-from six import iteritems #six is a compatibility library and iteritems returns an iterator over dictionary‘s items
+dictionary = corpora.Dictionary(texts)
+dictionary.save('cleanfiles.txtdic')#dictionary een gepaste naam geven
+
+
+
+'''from six import iteritems #six is a compatibility library and iteritems returns an iterator over dictionary‘s items
 #collect statistics about all tokens
 dictionary = corpora.Dictionary(line.lower().split() for line in open(''))
  #remove stop words and words that appear only once
@@ -81,5 +78,5 @@ stop_ids = [dictionary.token2id[stopword] for stopword in stoplist
 once_ids = [tokenid for tokenid, docfreq in iteritems(dictionary.dfs) if docfreq == 1]
 dictionary.filter_tokens(stop_ids + once_ids)  # remove stop words and words that appear only once
 dictionary.compactify()  # remove gaps in id sequence after words that were removed
-print(dictionary)
+print(dictionary)'''
   
