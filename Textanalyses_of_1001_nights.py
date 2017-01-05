@@ -469,9 +469,10 @@ clean_corpus= []
 for file in listdir('clean_doc'):
 	if pattern.search(file):
 		clean_corpus.append('clean_doc' + '/' + file)
-print(len(clean_corpus)) #To check whether all 1030 files are in the corpus. It is indeed correct.
+#print(len(clean_corpus)) #To check whether all 1030 files are in the corpus. It is indeed correct.
 
 # Now we make a nested list and afterwards a dictionary, this is necessary for creating the document matrix
+import gensim
 from gensim import corpora
 nested_list = []
 for tale in clean_corpus:
@@ -485,10 +486,20 @@ dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
+# We are ready to turn the dictionary into a document-term matrix
+# Now we convert the dictionary into a bag of words and call it a vector corpus
+vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
+#print(vector_corpus [2]) #list of sparse vectors equal to the number of documents. 
+#In each document the sparse vector is a series of tuples.The tuples are (term ID, term frequency) pairs.
 
+#######################################
+# Ready for topic modeling
+#######################################
+ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=20, id2word = dictionary, passes=10)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
+# second parameter: our previous dictionary to map ids to strings
+# third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
+#But a lot of passes can be slow on a very large corpus.So let's say we do 10 laps.
 
-
-
-
-
-  
+print(ldamodel.print_topics(num_topics=len(dictionary), num_words=3)) 
+# first parameter defines the number of topics, second parameter the number of words per topic

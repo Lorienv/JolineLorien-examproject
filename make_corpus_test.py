@@ -65,7 +65,7 @@ print(texts)
 
 
 dictionary = corpora.Dictionary(texts)
-dictionary.save('cleanfiles.txtdic')#dictionary een gepaste naam geven
+dictionary.save('clean_doc.textdict')#dictionary een gepaste naam geven
 
 
 
