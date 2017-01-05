@@ -431,7 +431,7 @@ p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
 
-
+'''
 for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
@@ -461,15 +461,31 @@ for tale in corpus_tales:
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
+'''
 
-
-# now we make a new corpus consisting of the filtered texts
-pattern = re.compile(r'.*') 
+# Now we make a new corpus consisting of the filtered texts
+pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
 for file in listdir('clean_doc'):
 	if pattern.search(file):
 		clean_corpus.append('clean_doc' + '/' + file)
-print(len(clean_corpus))
+print(len(clean_corpus)) #To check whether all 1030 files are in the corpus. It is indeed correct.
+
+# Now we make a nested list and afterwards a dictionary, this is necessary for creating the document matrix
+from gensim import corpora
+nested_list = []
+for tale in clean_corpus:
+	f = open(tale,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = nltk.word_tokenize(text)
+	nested_list.append(text)
+dictionary = corpora.Dictionary(nested_list)
+dictionary.save('clean_files_dic.txtdic')
+#print(dictionary.token2id)
+
+
+
 
 
 
