@@ -495,16 +495,27 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 #######################################
 # Ready for topic modeling
 #######################################
-ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=20, id2word = dictionary, passes=15)
-# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
+
+
+import numpy
+numpy.random.seed(1) #setting random seed to get the same results each time.
+ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word = dictionary, passes=10)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for ... topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
-#But a lot of passes can be slow on a very large corpus.So let's say we do 10 laps.
+#But a lot of passes can be slow on a very large corpus.So let's say we do ... laps.
 
-ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
-print(ldamodel.show_topics(num_topics=len(dictionary), num_words=3))
+#print(ldamodel.show_topics(num_topics=len(dictionary), num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
- 
+# we want to store doc_topics, word_topics for all the documents in the corpus in a variable
+# so we can later access details of a particular document using its index
+topics = ldamodel.get_document_topics(vector_corpus, per_word_topics=True) 
+all_topics = [(doc_topics, word_topics) for doc_topics, word_topics in topics]
+
+doc_topic, word_topics = all_topics[2] # now we ask for the doc and word topics of file 3
+print ('Document topic:', doc_topics, "\n")
+print ('Word topic:', word_topics, "\n")
