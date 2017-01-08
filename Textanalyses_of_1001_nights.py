@@ -514,5 +514,5 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 #print(ldamodel.show_topics(num_topics=3, num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
-#print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
+print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
 
