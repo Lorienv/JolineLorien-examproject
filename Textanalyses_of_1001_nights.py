@@ -283,7 +283,7 @@ for volume in read_corpus:
 #####################################
 #Calculate statistics for each night
 #####################################   	
-'''
+
 #Make a new corpus, consisting of the nights so statistics can be calculated
 #Each time, I will make a dictionary so it is easy to look up how many words/ lines/ characters... a night has
 #Each time, I will also have to make a list. These will then be used to visualise the statistics. 
@@ -291,7 +291,7 @@ for volume in read_corpus:
 corpus_root= 'data'
 corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
 print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
-
+'''
 #How many characters does each night have? 
 import collections
 def calculate_characters_nights(corpus):
@@ -431,8 +431,7 @@ from nltk.stem.porter import PorterStemmer
 p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
-
-
+'''
 for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
@@ -465,7 +464,7 @@ for tale in corpus_tales:
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
 
-
+'''
 # Now we make a new corpus consisting of the filtered texts
 pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
@@ -477,6 +476,7 @@ for file in listdir('clean_doc'):
 # Now we make a nested list and afterwards a dictionary, this is necessary for creating the document matrix
 import gensim
 from gensim import corpora
+
 nested_list = []
 for tale in clean_corpus:
 	f = open(tale,'rt', encoding='utf-8')
@@ -499,7 +499,6 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 # Ready for topic modeling
 #######################################
 
-
 import numpy
 #numpy.random.seed(1) #setting random seed to get the same results each time.
 ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word = dictionary, passes=6)
@@ -514,5 +513,61 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 #print(ldamodel.show_topics(num_topics=3, num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
-print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
+#print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
+
+# Now that we have our ldamodel and have an idea about the topics that are in fairy tales, we want to test the model
+# on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
+
+#I more or less took the clean code used above, but changed a few things to make it work for this corpus.
+'''
+for night in corpus_nightsII.fileids():
+	filtered_text = []
+	f = open('data/' + night, 'rt', encoding='utf-8') 
+	text = f.read()
+	f.close()
+	text = text.lower()
+	text = nltk.word_tokenize(text)
+	for item in text:
+		if item in punc:
+			continue
+		if item in additional_punc:
+			continue	
+		if item in stoplist:
+			continue
+		if item in additional_stopwords:
+			continue
+		filtered_text.append(item)
+	pos_text = nltk.pos_tag(filtered_text)
+	for tuples in pos_text: #this will remove modals and cardinal numbers
+		if tuples[1] == 'MD':
+			filtered_text.remove(tuples[0])
+		if tuples[1] == 'CD':
+			filtered_text.remove(tuples[0])	
+	#filtered_text = [p_stemmer.stem(i) for i in filtered_text] #the words are stemmed. We noticed that some words turned into a rather strange stem and we don't know whether that is how it should be.				
+	for words in filtered_text:
+		frequency[words] += 1
+	filtered_text = [words for words in filtered_text if frequency[words] > 1] #now only words that occur more than once are in 'filtered_text'	
+	filename = 'clean_nights/' + str(night[:-4]) + '_filtered' + '.txt'
+	f_out = open(filename,'wt', encoding='utf-8')
+	f_out.write(' '.join(filtered_text))
+	f_out.close()
+'''
+# The cleaned nights are now in 'clean_nights', now we can convert them to a BOW representation	
+pattern = re.compile(r'[Tt]he') 
+clean_nights_corpus = []
+for file in listdir('clean_nights'):
+	if pattern.search(file):
+		clean_nights_corpus.append('clean_nights' + '/' + file)
+nested_list_nights = []
+for file in clean_nights_corpus:
+	f = open(file,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = nltk.word_tokenize(text)
+	nested_list_nights.append(text)
+dictionary = corpora.Dictionary(nested_list_nights)	
+
+vector_corpus_nights = [dictionary.doc2bow(text) for text in nested_list_nights]
+
+night_lda = ldamodel[vector_corpus_nights] #This should give us a matrix with the nights and the topics, but it throws an error.
 
