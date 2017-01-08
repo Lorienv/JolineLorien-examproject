@@ -424,6 +424,7 @@ import string
 punc = string.punctuation #import a list of punctuation
 from nltk.corpus import stopwords #import a list of stopwords
 stoplist = stopwords.words('english')
+additional_stopwords = ['thou', 'thee', 'thy'] #these are middle English stopwords that are not in the nltk list
 additional_punc = ['``','--', "''"] #this is punctuation that might be in some tales, but is not in the punctuation list of nltk
 import nltk #import nltk to be able to use the tokenizer
 from nltk.stem.porter import PorterStemmer
@@ -431,8 +432,8 @@ p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
 
-'''
-for tale in corpus_tales:
+
+'''for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
 	text = f.read()
@@ -446,6 +447,8 @@ for tale in corpus_tales:
 			continue	
 		if item in stoplist:
 			continue
+		if item in additional_stopwords:
+			continue
 		filtered_text.append(item)
 	pos_text = nltk.pos_tag(filtered_text)
 	for tuples in pos_text: #this will remove modals and cardinal numbers
@@ -453,15 +456,15 @@ for tale in corpus_tales:
 			filtered_text.remove(tuples[0])
 		if tuples[1] == 'CD':
 			filtered_text.remove(tuples[0])	
-	filtered_text = [p_stemmer.stem(i) for i in filtered_text] #the words are stemmed. We noticed that some words turned into a rather strange stem and we don't know whether that is how it should be.				
+	#filtered_text = [p_stemmer.stem(i) for i in filtered_text] #the words are stemmed. We noticed that some words turned into a rather strange stem and we don't know whether that is how it should be.				
 	for words in filtered_text:
 		frequency[words] += 1
 	filtered_text = [words for words in filtered_text if frequency[words] > 1] #now only words that occur more than once are in 'filtered_text'	
 	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
-	f_out.close()
-'''
+	f_out.close()'''
+
 
 # Now we make a new corpus consisting of the filtered texts
 pattern = re.compile(r'[Tt]he') 
@@ -482,7 +485,7 @@ for tale in clean_corpus:
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
 dictionary = corpora.Dictionary(nested_list)
-#dictionary.save('clean_files_dic.txtdic')
+dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
@@ -495,16 +498,21 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 #######################################
 # Ready for topic modeling
 #######################################
-ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=20, id2word = dictionary, passes=15)
-# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
+
+
+import numpy
+numpy.random.seed(1) #setting random seed to get the same results each time.
+ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word = dictionary, passes=6)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for ... topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
-#But a lot of passes can be slow on a very large corpus.So let's say we do 10 laps.
+#But a lot of passes can be slow on a very large corpus.So let's say we do ... laps.
 
-ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
-print(ldamodel.show_topics(num_topics=len(dictionary), num_words=3))
+print(ldamodel.show_topics(num_topics=3, num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
- 
+#print(ldamodel.print_topics(5)) #print the most contributing words for 20 randomly selected topics
+
