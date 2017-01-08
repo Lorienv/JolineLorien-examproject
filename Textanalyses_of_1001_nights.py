@@ -433,7 +433,7 @@ from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
 
 
-'''for tale in corpus_tales:
+for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
 	text = f.read()
@@ -463,7 +463,7 @@ frequency = defaultdict(int)# make an empty default dict so we can compute the f
 	filename = 'clean_doc/' + str(tale[5:-4]) + '_filtered' + '.txt' # 5:-4 so 'data/' is left out as well as '.txt'.
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
-	f_out.close()'''
+	f_out.close()
 
 
 # Now we make a new corpus consisting of the filtered texts
@@ -511,7 +511,7 @@ ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word 
 #ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
-print(ldamodel.show_topics(num_topics=3, num_words=4))
+#print(ldamodel.show_topics(num_topics=3, num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
 #print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
