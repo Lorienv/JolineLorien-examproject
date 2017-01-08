@@ -485,7 +485,7 @@ for tale in clean_corpus:
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
 dictionary = corpora.Dictionary(nested_list)
-dictionary.save('clean_files_dic.txtdic')
+#dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
@@ -501,7 +501,7 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 
 
 import numpy
-numpy.random.seed(1) #setting random seed to get the same results each time.
+#numpy.random.seed(1) #setting random seed to get the same results each time.
 ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word = dictionary, passes=6)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for ... topics.
 # second parameter: our previous dictionary to map ids to strings
@@ -514,5 +514,5 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 print(ldamodel.show_topics(num_topics=3, num_words=4))
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
-#print(ldamodel.print_topics(5)) #print the most contributing words for 20 randomly selected topics
+#print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
 
