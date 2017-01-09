@@ -501,11 +501,11 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 
 import numpy
 #numpy.random.seed(1) #setting random seed to get the same results each time.
-ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=5, id2word = dictionary, passes=6)
-# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for ... topics.
+ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=100, id2word = dictionary, passes=10)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
-#But a lot of passes can be slow on a very large corpus.So let's say we do ... laps.
+#But a lot of passes can be slow on a very large corpus.So let's say we do 10 laps.
 
 #ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
@@ -569,5 +569,18 @@ dictionary = corpora.Dictionary(nested_list_nights)
 
 vector_corpus_nights = [dictionary.doc2bow(text) for text in nested_list_nights]
 
-night_lda = ldamodel[vector_corpus_nights] #This should give us a matrix with the nights and the topics, but it throws an error.
+night_lda = ldamodel[vector_corpus_nights] #infer topic distributions on the 'new  documents', night_lda is a transformedcorpus object
 
+#print(night_lda[0:]) #indexing works for printing, but don't know what it means yet
+
+from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+from scipy.cluster.hierarchy import dendrogram, linkage
+import numpy as np
+
+Z = linkage(vector_corpus, 'cosine') 
+'''# this is how you generate a linkage matrix. 
+'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
+we use the cosine similarity because it is better for topic clustering # X stands for the matrix. I thought our matrix was night_lda, but that is wrong
+we still have to find out how to make a matrix like in the tutorial'''
+
+print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
