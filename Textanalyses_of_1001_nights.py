@@ -291,7 +291,7 @@ for volume in read_corpus:
 corpus_root= 'data'
 corpus_nightsII = PlaintextCorpusReader(corpus_root, '[Tt]he\s.*')	
 print(len(corpus_nightsII.fileids())) #to check whether all 990 nights are in the corpus
-
+'''
 #How many characters does each night have? 
 import collections
 def calculate_characters_nights(corpus):
@@ -348,17 +348,17 @@ for file in corpus_nightsII.fileids(): #calculate the amount of sentences in eac
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
 	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
-
+'''
 #####################################
 #visualise statistics for each night
 ##################################### 
-'''
+
 #collect data for table with total numbers for each night
 
-characters_per_night = [] #list of the characters per night
+'''characters_per_night = [] #list of the characters per night
 for tuples in char_list_night:
 	characters_per_night.append(tuples[1])	
-#print(characters_per_night)
+print(characters_per_night)
 
 # Now we have this list, we can also calculate the average amount of characters in a file:
 avarage_characters = sum(characters_per_night)/len(characters_per_night)
@@ -367,7 +367,7 @@ print(round(avarage_characters)) # On average, there are 6603 characters in a fi
 lines_per_night = [] #list of the lines per night
 for tuples in line_list_nights:
 	lines_per_night.append(tuples[1])
-#print(lines_per_night)
+print(lines_per_night)
 
 avarage_lines = sum(lines_per_night)/len(lines_per_night)
 print(round(avarage_lines)) #On average, there are 166 characters in a file
@@ -433,7 +433,7 @@ writer.save() #save and close the excel file
 #Prepare the texts for topic modeling
 #######################################
 # First, we make a new corpus consisting of the nights and some additional texts, because we need enough data to apply topic modelling.
-'''
+
 pattern = re.compile(r'[Tt]he') 
 corpus_tales = []
 for file in listdir('data'):
@@ -454,7 +454,7 @@ from nltk.stem.porter import PorterStemmer
 p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
-
+'''
 for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
@@ -487,7 +487,7 @@ for tale in corpus_tales:
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
 
-
+'''
 # Now we make a new corpus consisting of the filtered texts
 pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
@@ -542,7 +542,7 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 # on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
 
 #I more or less took the clean code used above, but changed a few things to make it work for this corpus.
-
+'''
 for night in corpus_nightsII.fileids():
 	filtered_text = []
 	f = open('data/' + night, 'rt', encoding='utf-8') 
@@ -574,7 +574,7 @@ for night in corpus_nightsII.fileids():
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
-
+'''
 # The cleaned nights are now in 'clean_nights', now we can convert them to a BOW representation	
 pattern = re.compile(r'[Tt]he') 
 clean_nights_corpus = []
@@ -599,11 +599,11 @@ night_lda = ldamodel[vector_corpus_nights] #infer topic distributions on the 'ne
 from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 from scipy.cluster.hierarchy import dendrogram, linkage
 import numpy as np
-'''
-#Z = linkage(vector_corpus, 'cosine') 
+
+Z = linkage(vector_corpus, 'cosine') 
 '''# this is how you generate a linkage matrix. 
 'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
 we use the cosine similarity because it is better for topic clustering # X stands for the matrix. I thought our matrix was night_lda, but that is wrong
 we still have to find out how to make a matrix like in the tutorial'''
 
-#print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
+print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
