@@ -342,12 +342,22 @@ for file in corpus_nightsII.fileids(): #calculate the amount of words in each vo
 	word_dic_nights[file] = len(corpus_nightsII.words(file))
 	word_dic_nights = collections.OrderedDict(word_dic_nights) #we make sure that the order of the data stays the same
 
+#Which night has the most words?
+for file, characters in word_list_nights:
+	if characters == max(word_dic_nights.values()):
+		print(file, characters)
+
 sentence_list_nights = []
 sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
 	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
+
+#Which night has the most sentences?
+for file, characters in sentence_list_nights:
+	if characters == max(sentence_dic_nights.values()):
+		print(file, characters)	
 '''
 #####################################
 #visualise statistics for each night
@@ -542,7 +552,7 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 # Now that we have our ldamodel and have an idea about the topics that are in fairy tales, we want to test the model
 # on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
 
-#I more or less took the clean code used above, but changed a few things to make it work for this corpus.
+# We are not sure whether we need to clean the testcorpus as well. We did it to be sure.
 '''
 for night in corpus_nightsII.fileids():
 	filtered_text = []
@@ -582,24 +592,21 @@ clean_nights_corpus = []
 for file in listdir('clean_nights'):
 	if pattern.search(file):
 		clean_nights_corpus.append('clean_nights' + '/' + file)
-nested_list_nights = []
+
+corpus = []
 for file in clean_nights_corpus:
 	f = open(file,'rt', encoding='utf-8')
 	text = f.read()
 	f.close()
 	text = nltk.word_tokenize(text)
-	nested_list_nights.append(text)
-dictionary = corpora.Dictionary(nested_list_nights)	
+	bow_vector = dictionary.doc2bow(text)
+	lda_vector = ldamodel[bow_vector]
+	corpus.append(lda_vector)
 
-vector_corpus_nights = [dictionary.doc2bow(text) for text in nested_list_nights]
-#print(vector_corpus_nights)
+import numpy as np
+X = np.array(corpus) #should be the matrix containing the nights & the topics
 
-night_lda = ldamodel[vector_corpus_nights] #infer topic distributions on the 'new  documents', night_lda is a transformedcorpus object
-#print(night_lda)
-#print(ldamodel.print_topic(max(night_lda, key=lambda item: item[1])[0])) #does not work
-#print(ldamodel.show_topics(night_lda)) #does not work
-
-'''import numpy as np
+'''
 topics_matrix = night_lda.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
 topics_matrix = np.array(night_lda)
 print(topics_matrix)
@@ -608,9 +615,6 @@ topic_words = topics_matrix[:,:,1]
 for i in topic_words:
     print([str(word) for word in i])
     print(topic_words)'''
-
-
-print(night_lda[2]) #indexing works for printing, but don't know what it means yet
 
 ###########################################
 # Hierarchical clustering with topic model
