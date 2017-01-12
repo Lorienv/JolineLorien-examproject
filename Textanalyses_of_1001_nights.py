@@ -533,10 +533,11 @@ ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=100, id2wor
 #ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
-#print(ldamodel.show_topics(num_topics=3, num_words=4))
+#print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 
-#print(ldamodel.print_topics(5)) #print the most contributing words for ... randomly selected topics
+#print(ldamodel.print_topics(5) #print the most contributing words for ... randomly selected topics
+
 
 # Now that we have our ldamodel and have an idea about the topics that are in fairy tales, we want to test the model
 # on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
@@ -591,19 +592,38 @@ for file in clean_nights_corpus:
 dictionary = corpora.Dictionary(nested_list_nights)	
 
 vector_corpus_nights = [dictionary.doc2bow(text) for text in nested_list_nights]
+#print(vector_corpus_nights)
 
 night_lda = ldamodel[vector_corpus_nights] #infer topic distributions on the 'new  documents', night_lda is a transformedcorpus object
+#print(night_lda)
+#print(ldamodel.print_topic(max(night_lda, key=lambda item: item[1])[0])) #does not work
+#print(ldamodel.show_topics(night_lda)) #does not work
 
-#print(night_lda[0:]) #indexing works for printing, but don't know what it means yet
+'''import numpy as np
+topics_matrix = night_lda.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
+topics_matrix = np.array(night_lda)
+print(topics_matrix)
 
-from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+topic_words = topics_matrix[:,:,1] 
+for i in topic_words:
+    print([str(word) for word in i])
+    print(topic_words)'''
+
+
+print(night_lda[2]) #indexing works for printing, but don't know what it means yet
+
+###########################################
+# Hierarchical clustering with topic model
+###########################################
+
+'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 from scipy.cluster.hierarchy import dendrogram, linkage
 import numpy as np
 
 Z = linkage(vector_corpus, 'cosine') 
-'''# this is how you generate a linkage matrix. 
+# this is how you generate a linkage matrix. 
 'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
 we use the cosine similarity because it is better for topic clustering # X stands for the matrix. I thought our matrix was night_lda, but that is wrong
-we still have to find out how to make a matrix like in the tutorial'''
+we still have to find out how to make a matrix like in the tutorial
+print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass'''
 
-print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
