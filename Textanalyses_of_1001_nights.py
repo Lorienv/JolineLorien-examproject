@@ -604,11 +604,14 @@ for file in clean_nights_corpus:
 	corpus.append(lda_vector)
 
 import numpy as np
+Y = np.matrix(corpus)
 X = np.array(corpus) #should be the matrix containing the nights & the topics
+#print(Y)
+print(X)
 
-'''
-topics_matrix = night_lda.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
-topics_matrix = np.array(night_lda)
+
+'''topics_matrix = X.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
+topics_matrix = np.array(X)
 print(topics_matrix)
 
 topic_words = topics_matrix[:,:,1] 
@@ -620,14 +623,22 @@ for i in topic_words:
 # Hierarchical clustering with topic model
 ###########################################
 
-'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 from scipy.cluster.hierarchy import dendrogram, linkage
 import numpy as np
 
-Z = linkage(vector_corpus, 'cosine') 
-# this is how you generate a linkage matrix. 
-'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
-we use the cosine similarity because it is better for topic clustering # X stands for the matrix. I thought our matrix was night_lda, but that is wrong
-we still have to find out how to make a matrix like in the tutorial
-print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass'''
+#Z = linkage(Y, 'cosine') 
+'''this is how you generate a linkage matrix. But this gives a ValueError: setting an array element with a sequence. 
+This is because only equally shaped arrays can be clustered, we have a difference in lengths between the lists inside the list of lists 
 
+'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
+we use the cosine similarity because it is better for topic clustering # X stands for the matrix. '''
+#print(Z[1]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
+
+'''#plotting a hierarchical clustering dendogram
+plt.figure(figsize=(25, 10))
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('sample index')
+plt.ylabel('distance')
+dendrogram(Z,leaf_rotation=90.,leaf_font_size=8.)
+plt.show()'''
