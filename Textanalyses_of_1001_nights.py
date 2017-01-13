@@ -345,7 +345,7 @@ for file in corpus_nightsII.fileids(): #calculate the amount of words in each vo
 #Which night has the most words?
 for file, characters in word_list_nights:
 	if characters == max(word_dic_nights.values()):
-		print(file, characters)
+		print(file, characters) #the Eight Hundred and Forty-fifth.txt => 11794
 
 sentence_list_nights = []
 sentence_dic_nights = {}
@@ -357,7 +357,21 @@ for file in corpus_nightsII.fileids(): #calculate the amount of sentences in eac
 #Which night has the most sentences?
 for file, characters in sentence_list_nights:
 	if characters == max(sentence_dic_nights.values()):
-		print(file, characters)	
+		print(file, characters)	#the Eight Hundred and Forty-fifth.txt => 399
+
+#In the following block of code, we calculate what the average word length is in each night
+from nltk import FreqDist
+import nltk
+dict_word_length = {}
+for file in corpus_nightsII.fileids():
+	f = open('data/' + file, 'rt', encoding='utf-8') 
+	text = f.read()
+	f.close()
+	text = nltk.word_tokenize(text)
+	x = [len(words) for words in text]
+	fdist = FreqDist(x)
+	dict_word_length[file] = fdist.max()
+#print(dict_word_length)
 '''
 #####################################
 #visualise statistics for each night
@@ -507,7 +521,7 @@ for file in listdir('clean_doc'):
 #print(len(clean_corpus)) #To check whether all 1030 files are in the corpus. It is indeed correct.
 
 # Now we make a nested list and afterwards a dictionary, this is necessary for creating the document matrix
-import gensim
+'''import gensim
 from gensim import corpora
 
 nested_list = []
@@ -517,14 +531,14 @@ for tale in clean_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
-	dictionary = corpora.Dictionary(nested_list)
+	dictionary = corpora.Dictionary(nested_list)'''
 #dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
 # We are ready to turn the dictionary into a document-term matrix
 # Now we convert the dictionary into a bag of words and call it a vector corpus
-vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
+#vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
 #print(vector_corpus [2]) #list of sparse vectors equal to the number of documents. 
 #In each document the sparse vector is a series of tuples.The tuples are (term ID, term frequency) pairs.
 
@@ -534,14 +548,14 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 
 import numpy
 #numpy.random.seed(1) #setting random seed to get the same results each time.
-ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
+#ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
 #But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
 #ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
-ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
+#ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
@@ -585,13 +599,13 @@ for night in corpus_nightsII.fileids():
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
-'''
+
 # The cleaned nights are now in 'clean_nights', now we can convert them to a BOW representation	
 pattern = re.compile(r'[Tt]he') 
 clean_nights_corpus = []
 for file in listdir('clean_nights'):
 	if pattern.search(file):
-		clean_nights_corpus.append('clean_nights' + '/' + file)
+		clean_nights_corpus.append('clean_nights' + '/' + file)'''
 
 '''corpus = []
 for file in clean_nights_corpus:
@@ -603,31 +617,26 @@ for file in clean_nights_corpus:
 	lda_vector = ldamodel[bow_vector]
 	corpus.append(lda_vector)'''
 
-f = open('clean_nights/the Eight Hundred and Eighteenth_filtered.txt','rt', encoding='utf-8') 
-text = f.read()
-f.close()
-text = nltk.word_tokenize(text)
-bow_vector = dictionary.doc2bow(text)
-lda_vector = ldamodel[bow_vector]
-print(lda_model.print_topic(max(lda_vector, key=lambda item: item[1])[0]))
+# Now we would like to print every document's single most prominent LDA topic in a separate txt file
+f_out = open('topic_per_night.txt','at', encoding='utf-8')
+for file in clean_nights_corpus:
+	f = open(file,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = nltk.word_tokenize(text)
+	bow_vector = dictionary.doc2bow(text)
+	lda_vector = ldamodel[bow_vector]
+	topic = ldamodel.print_topic(max(lda_vector, key=lambda item: item[1])[0])
+	f_out.write('\n' + file + ':\n' + topic + '\n')
+f_out.close()	
 
-
+# Now we make a matrix of the documents & topics:
 #import numpy as np
 #X = ldamodel.show_topics(num_topics= 200, num_words=20) #not necessary, was just a test to see if it made any difference
 #X = np.array(corpus) #should be the matrix containing the nights & the topics
 
 #print(X.shape)
 #print(X)
-
-
-'''topics_matrix = X.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
-topics_matrix = np.array(X)
-print(topics_matrix)
-
-topic_words = topics_matrix[:,:,1] 
-for i in topic_words:
-    print([str(word) for word in i])
-    print(topic_words)'''
 
 ###########################################
 # Hierarchical clustering with topic model
