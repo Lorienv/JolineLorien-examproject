@@ -533,14 +533,14 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 #######################################
 
 import numpy
-#numpy.random.seed(1) #setting random seed to get the same results each time.
-ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=100, id2word = dictionary, passes=10)
-# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
+numpy.random.seed(1) #setting random seed to get the same results each time.
+ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=200, id2word = dictionary, passes=15)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
-#But a lot of passes can be slow on a very large corpus.So let's say we do 10 laps.
+#But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
-#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
@@ -604,11 +604,15 @@ for file in clean_nights_corpus:
 	corpus.append(lda_vector)
 
 import numpy as np
+
 X = np.array(corpus) #should be the matrix containing the nights & the topics
 
-'''
-topics_matrix = night_lda.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
-topics_matrix = np.array(night_lda)
+#print(X.shape)
+#print(X)
+
+
+'''topics_matrix = X.show_topics(formatted=False, num_words=20) # tried to create a topics matrix, but it doesn't work
+topics_matrix = np.array(X)
 print(topics_matrix)
 
 topic_words = topics_matrix[:,:,1] 
@@ -619,15 +623,32 @@ for i in topic_words:
 ###########################################
 # Hierarchical clustering with topic model
 ###########################################
+from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 
-'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist, squareform
+dm = squareform(pdist(X, 'cosine'))
+
+'''from scipy.cluster.hierarchy import linkage
+linkage_object = linkage(dm, method='ward', metric='euclidean')
+
+from scipy.cluster.hierarchy import dendrogram
+d = dendrogram(linkage_object, labels=labels, orientation='right')
+plt.savefig('tree.pdf')
 import numpy as np
 
-Z = linkage(vector_corpus, 'cosine') 
-# this is how you generate a linkage matrix. 
-'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
-we use the cosine similarity because it is better for topic clustering # X stands for the matrix. I thought our matrix was night_lda, but that is wrong
-we still have to find out how to make a matrix like in the tutorial
-print(Z[10]) #Z[i] will tell us which clusters were merged in the i-th iteration/pass'''
+#Z = linkage(X, 'cosine') 
+this is how you generate a linkage matrix. But this gives a ValueError: setting an array element with a sequence. 
+This is because only equally shaped arrays can be clustered, we have a difference in lengths between the lists inside the list of lists 
 
+'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
+we use the cosine similarity because it is better for topic clustering # X stands for the matrix. 
+#print(Z) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
+
+#plotting a hierarchical clustering dendogram
+plt.figure(figsize=(25, 10))
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('sample index')
+plt.ylabel('distance')
+dendrogram(Z,leaf_rotation=90.,leaf_font_size=8.)
+plt.show()
+'''
