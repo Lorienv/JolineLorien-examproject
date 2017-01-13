@@ -517,7 +517,7 @@ for tale in clean_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
-dictionary = corpora.Dictionary(nested_list)
+	dictionary = corpora.Dictionary(nested_list)
 #dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
@@ -533,20 +533,20 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 #######################################
 
 import numpy
-numpy.random.seed(1) #setting random seed to get the same results each time.
-ldamodel = gensim.models.ldamodel.LdaModel(vector_corpus, num_topics=200, id2word = dictionary, passes=15)
+#numpy.random.seed(1) #setting random seed to get the same results each time.
+ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
 #But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
-ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
-
 #print(ldamodel.print_topics(5) #print the most contributing words for ... randomly selected topics
+
 
 
 # Now that we have our ldamodel and have an idea about the topics that are in fairy tales, we want to test the model
@@ -593,7 +593,7 @@ for file in listdir('clean_nights'):
 	if pattern.search(file):
 		clean_nights_corpus.append('clean_nights' + '/' + file)
 
-corpus = []
+'''corpus = []
 for file in clean_nights_corpus:
 	f = open(file,'rt', encoding='utf-8')
 	text = f.read()
@@ -601,11 +601,20 @@ for file in clean_nights_corpus:
 	text = nltk.word_tokenize(text)
 	bow_vector = dictionary.doc2bow(text)
 	lda_vector = ldamodel[bow_vector]
-	corpus.append(lda_vector)
+	corpus.append(lda_vector)'''
 
-import numpy as np
+f = open('clean_nights/the Eight Hundred and Eighteenth_filtered.txt','rt', encoding='utf-8') 
+text = f.read()
+f.close()
+text = nltk.word_tokenize(text)
+bow_vector = dictionary.doc2bow(text)
+lda_vector = ldamodel[bow_vector]
+print(lda_model.print_topic(max(lda_vector, key=lambda item: item[1])[0]))
 
-X = np.array(corpus) #should be the matrix containing the nights & the topics
+
+#import numpy as np
+#X = ldamodel.show_topics(num_topics= 200, num_words=20) #not necessary, was just a test to see if it made any difference
+#X = np.array(corpus) #should be the matrix containing the nights & the topics
 
 #print(X.shape)
 #print(X)
@@ -623,12 +632,12 @@ for i in topic_words:
 ###########################################
 # Hierarchical clustering with topic model
 ###########################################
-from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 
 from scipy.spatial.distance import pdist, squareform
 dm = squareform(pdist(X, 'cosine'))
 
-'''from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import linkage
 linkage_object = linkage(dm, method='ward', metric='euclidean')
 
 from scipy.cluster.hierarchy import dendrogram
