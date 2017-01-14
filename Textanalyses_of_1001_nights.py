@@ -72,8 +72,8 @@ for item in volumes.fileids(): #calculate the amount of words in each volume
 	print(item,':', len(volumes.words(item)), 'words')
 
 for item in volumes.fileids(): #calculate the amount of sentences in each volume
-	print(item,':', len(volumes.sents(item)), 'sentences')	'''
-
+	print(item,':', len(volumes.sents(item)), 'sentences')	
+'''
 ##################################################################
 #visualisation of the statistiscs with basic plotting techniques
 ##################################################################
@@ -364,10 +364,7 @@ from nltk import FreqDist
 import nltk
 dict_word_length = {}
 for file in corpus_nightsII.fileids():
-	f = open('data/' + file, 'rt', encoding='utf-8') 
-	text = f.read()
-	f.close()
-	text = nltk.word_tokenize(text)
+	text = corpus_nightsII.words(file)
 	x = [len(words) for words in text]
 	fdist = FreqDist(x)
 	dict_word_length[file] = fdist.max()
@@ -513,7 +510,7 @@ frequency = defaultdict(int)# make an empty default dict so we can compute the f
 '''
 
 # Now we make a new corpus consisting of the filtered texts
-pattern = re.compile(r'[Tt]he') 
+'''pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
 for file in listdir('clean_doc'):
 	if pattern.search(file):
@@ -531,14 +528,14 @@ for tale in clean_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
-	dictionary = corpora.Dictionary(nested_list)
+	dictionary = corpora.Dictionary(nested_list)'''
 #dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
 # We are ready to turn the dictionary into a document-term matrix
 # Now we convert the dictionary into a bag of words and call it a vector corpus
-vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
+#vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
 #print(vector_corpus [2]) #list of sparse vectors equal to the number of documents. 
 #In each document the sparse vector is a series of tuples.The tuples are (term ID, term frequency) pairs.
 
@@ -546,7 +543,7 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 # Ready for topic modeling
 #######################################
 
-import numpy
+#import numpy
 #numpy.random.seed(1) #setting random seed to get the same results each time.
 ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
@@ -554,14 +551,12 @@ ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictio
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
 #But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
-#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
 #print(ldamodel.print_topics(5) #print the most contributing words for ... randomly selected topics
-
-
 
 # Now that we have our ldamodel and have an idea about the topics that are in fairy tales, we want to test the model
 # on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
@@ -614,7 +609,7 @@ for file in clean_nights_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	bow_vector = dictionary.doc2bow(text)
-	lda_vector = ldamodel[bow_vector]
+	lda_vector = ldamodel[bow_vector]# dus Lorien, deze moet je dan aanpassen. Misschien moet je lda_vector ook even hernoemen omdat ik hieronder ook lda_vector gebruik :p gewoon voor de zekerheid
 	corpus.append(lda_vector)
 
 # Now we would like to print every document's single most prominent LDA topic in a separate txt file
@@ -632,11 +627,40 @@ f_out.close()
 '''
 # Now we make a matrix of the documents & topics:
 import numpy as np
-X = ldamodel.show_topics(num_topics= 50, num_words=10) #not necessary, was just a test to see if it made any difference
+'''X = ldamodel.show_topics(num_topics= 50, num_words=10) #not necessary, was just a test to see if it made any difference
 X = np.array(corpus) #should be the matrix containing the nights & the topics
 
-print(X.shape)
+print(X.shape)'''
 #print(X)
+
+#########################
+# Evaluate our LDA model
+#########################
+# We will split each document into two parts, and check that topics of the first half are similar to topics 
+# of the second halves. And we check whether two halves of different documents are less similar.
+# The halves of the same document should be very similar, the halves of different documents should be a bit 
+# less similar, although similarity is expected here as well, since they are all fairy tales.
+def intra_inter(model, test_docs, num_pairs=2000):
+    part1 = []
+    part2 = []
+    for file in test_docs:
+    	f = open(file, 'rt', encoding='utf-8') 
+		text = f.read()
+		f.close()
+		text = nltk.word_tokenize(text)
+		# split each test document into two halves and compute topics for each half
+		part1.append(model[dictionary.doc2bow(text[:len(text) / 2])])
+		part2.append(model[dictionary.doc2bow(text[len(text) / 2 :])])
+    
+    # print computed similarities (uses cossim)
+    print('average cosine similarity between corresponding parts (higher is better):')
+    print(np.mean([gensim.matutils.cossim(p1, p2) for p1, p2 in zip(part1, part2)]))
+
+    random_pairs = np.random.randint(0, len(test_docs), size=(num_pairs, 2))
+    print('average cosine similarity between 2000 random parts (should be a bit lower):')    
+    print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
+
+print(intra_inter(ldamodel, clean_nights_corpus))    
 
 ###########################################
 # Hierarchical clustering with topic model
