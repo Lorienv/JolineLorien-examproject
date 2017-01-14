@@ -352,7 +352,7 @@ sentence_dic_nights = {}
 for file in corpus_nightsII.fileids(): #calculate the amount of sentences in each volume
 	sentence_list_nights.append((file, len(corpus_nightsII.sents(file))))
 	sentence_dic_nights[file] = len(corpus_nightsII.sents(file))
-	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same
+	sentence_dic_nights = collections.OrderedDict(sentence_dic_nights) #we make sure that the order of the data stays the same 
 
 #Which night has the most sentences?
 for file, characters in sentence_list_nights:
@@ -471,14 +471,14 @@ import string
 punc = string.punctuation #import a list of punctuation
 from nltk.corpus import stopwords #import a list of stopwords
 stoplist = stopwords.words('english')
-additional_stopwords = ['thou', 'thee', 'thy'] #these are middle English stopwords that are not in the nltk list
+additional_stopwords = ["thou", "thee", 'thy', "'s"] #these are middle English stopwords that are not in the nltk list and the possesive 's'
 additional_punc = ['``','--', "''"] #this is punctuation that might be in some tales, but is not in the punctuation list of nltk
 import nltk #import nltk to be able to use the tokenizer
 from nltk.stem.porter import PorterStemmer
 p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
-'''
+
 for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
@@ -511,7 +511,7 @@ for tale in corpus_tales:
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
 
-'''
+
 # Now we make a new corpus consisting of the filtered texts
 pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
@@ -521,7 +521,7 @@ for file in listdir('clean_doc'):
 #print(len(clean_corpus)) #To check whether all 1030 files are in the corpus. It is indeed correct.
 
 # Now we make a nested list and afterwards a dictionary, this is necessary for creating the document matrix
-'''import gensim
+import gensim
 from gensim import corpora
 
 nested_list = []
@@ -531,14 +531,14 @@ for tale in clean_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
-	dictionary = corpora.Dictionary(nested_list)'''
-#dictionary.save('clean_files_dic.txtdic')
+	dictionary = corpora.Dictionary(nested_list)
+dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
 # We are ready to turn the dictionary into a document-term matrix
 # Now we convert the dictionary into a bag of words and call it a vector corpus
-#vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
+vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
 #print(vector_corpus [2]) #list of sparse vectors equal to the number of documents. 
 #In each document the sparse vector is a series of tuples.The tuples are (term ID, term frequency) pairs.
 
@@ -548,14 +548,14 @@ for tale in clean_corpus:
 
 import numpy
 #numpy.random.seed(1) #setting random seed to get the same results each time.
-#ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
+ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
 #But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
-#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
-#ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
+ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
 # first parameter defines the number of topics, second parameter the number of words per topic, this is 10 words per topic by default
@@ -567,7 +567,7 @@ import numpy
 # on our original corpus of tales: corpus_nightsII (in order to do that, we need to convert in into a BOW representation)
 
 # We are not sure whether we need to clean the testcorpus as well. We did it to be sure.
-'''
+
 for night in corpus_nightsII.fileids():
 	filtered_text = []
 	f = open('data/' + night, 'rt', encoding='utf-8') 
@@ -605,9 +605,9 @@ pattern = re.compile(r'[Tt]he')
 clean_nights_corpus = []
 for file in listdir('clean_nights'):
 	if pattern.search(file):
-		clean_nights_corpus.append('clean_nights' + '/' + file)'''
+		clean_nights_corpus.append('clean_nights' + '/' + file)
 
-'''corpus = []
+corpus = []
 for file in clean_nights_corpus:
 	f = open(file,'rt', encoding='utf-8')
 	text = f.read()
@@ -615,7 +615,7 @@ for file in clean_nights_corpus:
 	text = nltk.word_tokenize(text)
 	bow_vector = dictionary.doc2bow(text)
 	lda_vector = ldamodel[bow_vector]
-	corpus.append(lda_vector)'''
+	corpus.append(lda_vector)
 
 # Now we would like to print every document's single most prominent LDA topic in a separate txt file
 f_out = open('topic_per_night.txt','at', encoding='utf-8')
