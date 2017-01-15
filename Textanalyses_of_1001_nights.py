@@ -510,7 +510,7 @@ frequency = defaultdict(int)# make an empty default dict so we can compute the f
 '''
 
 # Now we make a new corpus consisting of the filtered texts
-'''pattern = re.compile(r'[Tt]he') 
+pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
 for file in listdir('clean_doc'):
 	if pattern.search(file):
@@ -528,14 +528,14 @@ for tale in clean_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	nested_list.append(text)
-	dictionary = corpora.Dictionary(nested_list)'''
+	dictionary = corpora.Dictionary(nested_list)
 #dictionary.save('clean_files_dic.txtdic')
 #print(dictionary.token2id)
 
 
 # We are ready to turn the dictionary into a document-term matrix
 # Now we convert the dictionary into a bag of words and call it a vector corpus
-#vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
+vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives us the document-term matrix
 #print(vector_corpus [2]) #list of sparse vectors equal to the number of documents. 
 #In each document the sparse vector is a series of tuples.The tuples are (term ID, term frequency) pairs.
 
@@ -544,6 +544,7 @@ for tale in clean_corpus:
 #######################################
 
 #import numpy
+
 #numpy.random.seed(1) #setting random seed to get the same results each time.
 ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
@@ -551,7 +552,7 @@ ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictio
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
 #But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
 
-ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
+#ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 #print(ldamodel.show_topics(num_topics=-1, num_words=4)) #prints the num_words most probable words for all topics to log. topics=-1 to print all topics.
@@ -609,7 +610,9 @@ for file in clean_nights_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	bow_vector = dictionary.doc2bow(text)
-	lda_vector = ldamodel[bow_vector]# dus Lorien, deze moet je dan aanpassen. Misschien moet je lda_vector ook even hernoemen omdat ik hieronder ook lda_vector gebruik :p gewoon voor de zekerheid
+	#lda_vector = ldamodel[bow_vector]# dus Lorien, deze moet je dan aanpassen. Misschien moet je lda_vector ook even hernoemen omdat ik hieronder ook lda_vector gebruik :p gewoon voor de zekerheid
+	lda_vector = ldamodel.get_document_topics(bow_vector, minimum_probability=0.0)
+	lda_vector = [b for (a, b) in sorted(lda_vector)]
 	corpus.append(lda_vector)
 
 # Now we would like to print every document's single most prominent LDA topic in a separate txt file
@@ -627,13 +630,13 @@ f_out.close()
 '''
 # Now we make a matrix of the documents & topics:
 import numpy as np
-'''X = ldamodel.show_topics(num_topics= 50, num_words=10) #not necessary, was just a test to see if it made any difference
-X = np.array(corpus) #should be the matrix containing the nights & the topics
+X = ldamodel.show_topics(num_topics= 50, num_words=10) #not necessary, was just a test to see if it made any difference
+X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
-print(X.shape)'''
+#print(X.shape) to check if the shape of our matrix is suitable for hierarchical clustering, it shoudl give the number of files and number of topics
 #print(X)
 
-#########################
+'''#########################
 # Evaluate our LDA model
 #########################
 # We will split each document into two parts, and check that topics of the first half are similar to topics 
@@ -645,12 +648,11 @@ def intra_inter(model, test_docs, num_pairs=2000):
     part2 = []
     for file in test_docs:
     	f = open(file, 'rt', encoding='utf-8') 
-		text = f.read()
-		f.close()
-		text = nltk.word_tokenize(text)
-		# split each test document into two halves and compute topics for each half
-		part1.append(model[dictionary.doc2bow(text[:len(text) / 2])])
-		part2.append(model[dictionary.doc2bow(text[len(text) / 2 :])])
+    	text = f.read()
+    	f.close()
+    	text = nltk.word_tokenize(text)# split each test document into two halves and compute topics for each half
+    	part1.append(ldamodel[dictionary.doc2bow(text[:len(text) / 2])])
+    	part2.append(ldamodel[dictionary.doc2bow(text[len(text) / 2 :])])
     
     # print computed similarities (uses cossim)
     print('average cosine similarity between corresponding parts (higher is better):')
@@ -660,12 +662,13 @@ def intra_inter(model, test_docs, num_pairs=2000):
     print('average cosine similarity between 2000 random parts (should be a bit lower):')    
     print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
 
-print(intra_inter(ldamodel, clean_nights_corpus))    
+print(intra_inter(ldamodel, clean_nights_corpus)) '''   
 
 ###########################################
 # Hierarchical clustering with topic model
 ###########################################
-'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+import numpy as np
 
 from scipy.spatial.distance import pdist, squareform
 dm = squareform(pdist(X, 'cosine'))
@@ -673,24 +676,58 @@ dm = squareform(pdist(X, 'cosine'))
 from scipy.cluster.hierarchy import linkage
 linkage_object = linkage(dm, method='ward', metric='euclidean')
 
-from scipy.cluster.hierarchy import dendrogram
-d = dendrogram(linkage_object, labels=labels, orientation='right')
-plt.savefig('tree.pdf')
-import numpy as np
+#from scipy.cluster.hierarchy import dendrogram
+#d = dendrogram(linkage_object, labels=labels, orientation='right')
+#plt.savefig('tree.pdf')
 
-#Z = linkage(X, 'cosine') 
-this is how you generate a linkage matrix. But this gives a ValueError: setting an array element with a sequence. 
+
+#creating a linkage matrix
+#Z = linkage(X, 'ward') 
+'''this is how you generate a linkage matrix. But this gives a ValueError: setting an array element with a sequence. 
 This is because only equally shaped arrays can be clustered, we have a difference in lengths between the lists inside the list of lists 
-
 'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
-we use the cosine similarity because it is better for topic clustering # X stands for the matrix. 
+we use the cosine similarity because it is better for topic clustering # X stands for the matrix.''' 
 #print(Z) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
 
 #plotting a hierarchical clustering dendogram
-plt.figure(figsize=(25, 10))
-plt.title('Hierarchical Clustering Dendrogram')
-plt.xlabel('sample index')
-plt.ylabel('distance')
-dendrogram(Z,leaf_rotation=90.,leaf_font_size=8.)
-plt.show()
-'''
+
+'''#creating word clouds
+import os
+import wordcloud
+
+MODELS_DIR = 'ldamodel'
+final_topics = open(os.path.join(MODELS_DIR, 'topic_per_night.txt', 'rb') 
+curr_topic = 0
+
+for line in final_topics:
+    line = line.strip()[line.rindex(":") + 2:]
+    scores = [float(x.split("*")[0]) for x in line.split(" + ")]
+    words = [x.split("*")[1] for x in line.split(" + ")]
+    freqs = []
+    for word, score in zip(words, scores):
+        freqs.append((word, score))
+    elements = wordcloud.fit_words(freqs, width=120, height=120)
+    wordcloud.draw(elements, "gs_topic_%d.png" % (curr_topic),
+                   width=120, height=120)
+    curr_topic += 1
+final_topics.close()'''
+
+
+
+'''tfidf = TfidfModel(vector_corpus)# first build TF-IDF model
+ 
+
+weights = tfidf(vector_corpus[0])# Get TF-IDF weights
+ 
+
+weights = [(dictionary[pair[0]], pair[1]) for pair in weights]# Get terms from the dictionary and pair with weights
+# Replace term IDs with human consumable strings
+#weights = [(counts[dictionary[pair[0]]], pair[1]) for pair in weights]
+
+wc = WordCloud(background_color="white",max_words=2000,width = 1024,height = 720)# Initialize the word cloud
+
+
+wc.generate_from_frequencies(weights)# Generate the cloud
+ 
+
+wc.to_file("word_cloud.png")# Save the could to a file'''
