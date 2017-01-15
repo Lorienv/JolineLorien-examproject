@@ -678,44 +678,32 @@ from scipy.cluster.hierarchy import linkage #creating a linkage matrix
 linkage_object = linkage(dm, method='ward', metric='euclidean')
 #print(linkage_object) #linkage_object[i] will tell us which clusters were merged in the i-th pass
 
-from scipy.cluster.hierarchy import dendrogram #calculate a full dendrogram
+'''from scipy.cluster.hierarchy import dendrogram #calculate a full dendrogram
 plt.figure(figsize=(25, 10))
 plt.title('Hierarchical Clustering Dendrogram')
 plt.xlabel('sample index')
 plt.ylabel('distance')
-dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
-plt.show()
+#dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
+#plt.show()
 from scipy.cluster.hierarchy import dendrogram
 plt.title('Hierarchical Clustering Dendrogram (truncated)') #we create a truncated dendrogram, which only shows the last p=15 out of our 989 merges.
 plt.xlabel('sample index')
 plt.ylabel('distance')
-dendrogram(linkage_object,truncate_mode='lastp',p=15,show_leaf_counts=False,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True)
+#dendrogram(linkage_object,truncate_mode='lastp',p=15,show_leaf_counts=False,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True)
 #lastp means 'show only the last p merged clusters',  show_leaf_counts=False, because otherwise numbers in brackets are counts,
 #show_contracted=True, because we want to get a distribution impression in truncated branches
-plt.show()
+#plt.show()'''
 
+#Get the number of flat clusters from a linkage matrix at a specified distance.
+import numpy
+def num_clusters(hc, d):
+	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
+
+number_clusters = num_clusters(linkage_object, 30)
+print(number_clusters)
 
 #creating word clouds
 
-
-
-
-#MODELS_DIR = 'ldamodel'
-#final_topics = open(os.path.join(MODELS_DIR, 'topic_per_night.txt', 'rb') 
-#curr_topic = 0
-
-#for line in final_topics:
-    #line = line.strip()[line.rindex(":") + 2:]
-    #scores = [float(x.split("*")[0]) for x in line.split(" + ")]
-    #words = [x.split("*")[1] for x in line.split(" + ")]
-    #freqs = []
-    #for word, score in zip(words, scores):
-        #freqs.append((word, score))
-    #elements = wordcloud.fit_words(freqs, width=120, height=120)
-    #wordcloud.draw(elements, "gs_topic_%d.png" % (curr_topic),
-                   #width=120, height=120)
-    #curr_topic += 1
-#final_topics.close()
 
 '''import os
 from os import path
@@ -737,7 +725,7 @@ wc = WordCloud(background_color="white",max_words=2000,width = 1024,height = 720
 wc.generate_from_frequencies(weights)# Generate the cloud
  
 
-wc.to_file("word_cloud_1001nights.png")# Save the could to a file
+wc.to_file("word_cloud_1001nights.png")# Save the cloud to a file
 
 #from scipy.cluster.hierarchy import fcluster
 
