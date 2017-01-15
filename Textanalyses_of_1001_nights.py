@@ -610,7 +610,7 @@ for file in clean_nights_corpus:
 	f.close()
 	text = nltk.word_tokenize(text)
 	bow_vector = dictionary.doc2bow(text)
-	#lda_vector = ldamodel[bow_vector]# dus Lorien, deze moet je dan aanpassen. Misschien moet je lda_vector ook even hernoemen omdat ik hieronder ook lda_vector gebruik :p gewoon voor de zekerheid
+	#lda_vector = ldamodel[bow_vector]
 	lda_vector = ldamodel.get_document_topics(bow_vector, minimum_probability=0.0)
 	lda_vector = [b for (a, b) in sorted(lda_vector)]
 	corpus.append(lda_vector)
@@ -635,8 +635,8 @@ X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
 #print(X.shape) to check if the shape of our matrix is suitable for hierarchical clustering, it shoudl give the number of files and number of topics
 #print(X)
-
-'''#########################
+'''
+#########################
 # Evaluate our LDA model
 #########################
 # We will split each document into two parts, and check that topics of the first half are similar to topics 
@@ -651,8 +651,9 @@ def intra_inter(model, test_docs, num_pairs=2000):
     	text = f.read()
     	f.close()
     	text = nltk.word_tokenize(text)# split each test document into two halves and compute topics for each half
-    	part1.append(ldamodel[dictionary.doc2bow(text[:len(text) / 2])])
-    	part2.append(ldamodel[dictionary.doc2bow(text[len(text) / 2 :])])
+    	x = round(len(text)/ 2)
+        part1.append(model[dictionary.doc2bow(text[:x])])
+        part2.append(model[dictionary.doc2bow(text[x:])])
     
     # print computed similarities (uses cossim)
     print('average cosine similarity between corresponding parts (higher is better):')
@@ -662,7 +663,7 @@ def intra_inter(model, test_docs, num_pairs=2000):
     print('average cosine similarity between 2000 random parts (should be a bit lower):')    
     print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
 
-print(intra_inter(ldamodel, clean_nights_corpus)) '''   
+print(intra_inter(ldamodel, clean_nights_corpus))   '''
 
 ###########################################
 # Hierarchical clustering with topic model
@@ -750,3 +751,98 @@ plt.imshow(wordcloud)
 plt.axis("off")
 plt.show()
 '''
+
+###############
+#Visualisation
+###############
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+# This code will iterate over the dictionary and print a random set of words in the color of the topic 
+# it belongs to most. 
+
+# These are colors assigned to the fifty topics.
+topic_colors = {0:'#FFC400', 1:'#30a2da', 2:'#FFFAF0', 3:'#FFC0CB', 4:'#B0E0E6', 5:'#FF0000', 6:'#FAA460', 7:'#2E8B57', 
+                8:'#FFF5EE', 9:'#A0522D', 10:'#C0C0C0', 11:'#87CEEB', 12:'#00FFFF', 13:'#7FFFD4', 
+                14:'#F0FFFF', 15:'#F5F5DC', 16:'#FFE4C4', 17:'#000000', 18:'#FFEBCD', 19:'#0000FF', 20:'#8A2BE2',
+                21:'#A52A2A', 22:'#DEB887', 23:'#5F9EA0', 24:'#7FFF00', 25:'#D2691E', 26:'#FF7F50', 27:'#6495ED', 
+                28:'#DC143C', 29:'#00FFFF', 30:'#00008B', 31:'#008B8B', 32:'#B8860B', 33:'#A9A9A9', 34:'#006400',
+                35:'#BDB76B', 36:'#8B008B', 37:'#556B2F', 38:'#FF8C00', 39:'#9932CC', 40:'#E9967A', 41:'#8FBC8F',
+                42:'#483D8B', 43:'#2F4F4F', 44:'#00CED1', 45:'#9400D3', 46:'#FF1493', 47:'#00BFFF', 48:'#696969',
+                49:'#1E90FF', 50:'#B22222'}
+
+def color_words_dictionary(model, dictionary):
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+
+    word_pos = 1/len(dictionary)
+
+    for word in dictionary:
+        list1 = model.get_term_topics(word)
+        test_list = []
+        for tuples in list1:
+            test_list.append(tuples[1])
+            if tuples[1] == max(test_list):
+                x = tuples[0] #choose number of topic that is highest! 
+        ax.text(0.2, word_pos, model.id2word[word],
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                    fontsize=20, color=topic_colors[x],  # choose just the most likely topic
+                    transform=ax.transAxes)
+        word_pos += 0.05
+
+    ax.set_axis_off()
+    plt.show()   
+
+#print(color_words_dictionary(ldamodel, dictionary))  
+
+# In this code will iterate over a particular night and print a set of words that are in the file in 
+# the color of the topic it belongs to. 
+def color_words_night(model, file):
+    f = open(file, 'rt', encoding='utf-8') 
+    text = f.read()
+    f.close()
+    text = nltk.word_tokenize(text)
+    text = model.id2word.doc2bow(text)
+    
+    # get word_topics
+    doc_topics, word_topics, phi_values = model.get_document_topics(text, per_word_topics=True)
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+
+    word_pos = 1/len(text)
+
+    for word, topics in word_topics:
+        ax.text(0.2, word_pos, model.id2word[word],
+                horizontalalignment='center',
+                verticalalignment='center',
+                fontsize=20, color=topic_colors[topics[0]], 
+                transform=ax.transAxes)
+        word_pos += 0.2
+
+    ax.set_axis_off()
+    plt.show()    
+
+# Say for example, we want to have a look at the Eight Hundred and Eighth night
+night = 'clean_nights/the Eight Hundred and Eighth_filtered.txt'
+print(color_words_night(ldamodel, night))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
