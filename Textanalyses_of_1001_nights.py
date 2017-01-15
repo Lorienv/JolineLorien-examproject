@@ -546,11 +546,11 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 #import numpy
 
 #numpy.random.seed(1) #setting random seed to get the same results each time.
-ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=50, id2word = dictionary, passes=5)
-# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 200 topics.
+ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=100, id2word = dictionary, passes=5)
+# first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
 # second parameter: our previous dictionary to map ids to strings
 # third parameter: number of laps the model will take through corpus. More passes = more accurate model. 
-#But a lot of passes can be slow on a very large corpus.So let's say we do 15 laps.
+#But a lot of passes can be slow on a very large corpus.So let's say we do 5 laps.
 
 #ldamodel.save('topicmodel.lda') #We save and load the model for later use instead of having to rebuild it every time
 ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
@@ -626,11 +626,11 @@ for file in clean_nights_corpus:
 	lda_vector = ldamodel[bow_vector]
 	topic = ldamodel.print_topic(max(lda_vector, key=lambda item: item[1])[0])
 	f_out.write('\n' + file + ':\n' + topic + '\n')
-f_out.close()	
-'''
+f_out.close()'''	
+
 # Now we make a matrix of the documents & topics:
 import numpy as np
-X = ldamodel.show_topics(num_topics= 50, num_words=10) #not necessary, was just a test to see if it made any difference
+X = ldamodel.show_topics(num_topics= 100, num_words=10) #not necessary, was just a test to see if it made any difference
 X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
 #print(X.shape) to check if the shape of our matrix is suitable for hierarchical clustering, it shoudl give the number of files and number of topics
@@ -671,50 +671,45 @@ from matplotlib import pyplot as plt   #this should be some start code for the h
 import numpy as np
 
 from scipy.spatial.distance import pdist, squareform
-dm = squareform(pdist(X, 'cosine'))
+dm = squareform(pdist(X, 'cosine'))#'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
+								   #we use the cosine similarity because it works better for topic clustering
 
-from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import linkage #creating a linkage matrix
 linkage_object = linkage(dm, method='ward', metric='euclidean')
+#print(linkage_object) #linkage_object[i] will tell us which clusters were merged in the i-th pass
 
-#from scipy.cluster.hierarchy import dendrogram
-#d = dendrogram(linkage_object, labels=labels, orientation='right')
-#plt.savefig('tree.pdf')
+'''from scipy.cluster.hierarchy import dendrogram #calculate a full dendrogram
+plt.figure(figsize=(25, 10))
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('sample index')
+plt.ylabel('distance')
+#dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
+#plt.show()
+from scipy.cluster.hierarchy import dendrogram
+plt.title('Hierarchical Clustering Dendrogram (truncated)') #we create a truncated dendrogram, which only shows the last p=15 out of our 989 merges.
+plt.xlabel('sample index')
+plt.ylabel('distance')
+#dendrogram(linkage_object,truncate_mode='lastp',p=15,show_leaf_counts=False,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True)
+#lastp means 'show only the last p merged clusters',  show_leaf_counts=False, because otherwise numbers in brackets are counts,
+#show_contracted=True, because we want to get a distribution impression in truncated branches
+#plt.show()'''
 
+#Get the number of flat clusters from a linkage matrix at a specified distance.
+import numpy
+def num_clusters(hc, d):
+	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
-#creating a linkage matrix
-#Z = linkage(X, 'ward') 
-'''this is how you generate a linkage matrix. But this gives a ValueError: setting an array element with a sequence. 
-This is because only equally shaped arrays can be clustered, we have a difference in lengths between the lists inside the list of lists 
-'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
-we use the cosine similarity because it is better for topic clustering # X stands for the matrix.''' 
-#print(Z) #Z[i] will tell us which clusters were merged in the i-th iteration/pass
+number_clusters = num_clusters(linkage_object, 30)
+print(number_clusters)
 
-#plotting a hierarchical clustering dendogram
-
-'''#creating word clouds
-import os
-import wordcloud
-
-MODELS_DIR = 'ldamodel'
-final_topics = open(os.path.join(MODELS_DIR, 'topic_per_night.txt', 'rb') 
-curr_topic = 0
-
-for line in final_topics:
-    line = line.strip()[line.rindex(":") + 2:]
-    scores = [float(x.split("*")[0]) for x in line.split(" + ")]
-    words = [x.split("*")[1] for x in line.split(" + ")]
-    freqs = []
-    for word, score in zip(words, scores):
-        freqs.append((word, score))
-    elements = wordcloud.fit_words(freqs, width=120, height=120)
-    wordcloud.draw(elements, "gs_topic_%d.png" % (curr_topic),
-                   width=120, height=120)
-    curr_topic += 1
-final_topics.close()'''
+#creating word clouds
 
 
+'''import os
+from os import path
+from wordcloud import WordCloud
 
-'''tfidf = TfidfModel(vector_corpus)# first build TF-IDF model
+tfidf = TfidfModel(vector_corpus)# first build TF-IDF model
  
 
 weights = tfidf(vector_corpus[0])# Get TF-IDF weights
@@ -730,4 +725,28 @@ wc = WordCloud(background_color="white",max_words=2000,width = 1024,height = 720
 wc.generate_from_frequencies(weights)# Generate the cloud
  
 
-wc.to_file("word_cloud.png")# Save the could to a file'''
+wc.to_file("word_cloud_1001nights.png")# Save the cloud to a file
+
+#from scipy.cluster.hierarchy import fcluster
+
+
+
+# Read the whole text.
+text = dictionary
+
+# Generate a word cloud image
+wordcloud = WordCloud().generate(text)
+
+# Display the generated image:
+# the matplotlib way:
+import matplotlib.pyplot as plt
+plt.imshow(wordcloud)
+plt.axis("off")
+
+# lower max_font_size
+wordcloud = WordCloud(max_font_size=40).generate(text)
+plt.figure()
+plt.imshow(wordcloud)
+plt.axis("off")
+plt.show()
+'''
