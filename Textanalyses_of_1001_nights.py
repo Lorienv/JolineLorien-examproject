@@ -634,8 +634,10 @@ X = ldamodel.show_topics(num_topics= 100, num_words=10) #not necessary, was just
 X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
 #print(X.shape) to check if the shape of our matrix is suitable for hierarchical clustering, it shoudl give the number of files and number of topics
-#print(X)
+print(len(X))
+print(X[0])
 '''
+
 #########################
 # Evaluate our LDA model
 #########################
@@ -668,7 +670,7 @@ print(intra_inter(ldamodel, clean_nights_corpus))   '''
 ###########################################
 # Hierarchical clustering with topic model
 ###########################################
-from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
+'''from matplotlib import pyplot as plt   #this should be some start code for the hierarchical clustering of our topics. Not finished yet!
 import numpy as np
 
 from scipy.spatial.distance import pdist, squareform
@@ -679,79 +681,63 @@ from scipy.cluster.hierarchy import linkage #creating a linkage matrix
 linkage_object = linkage(dm, method='ward', metric='euclidean')
 #print(linkage_object) #linkage_object[i] will tell us which clusters were merged in the i-th pass
 
-'''from scipy.cluster.hierarchy import dendrogram #calculate a full dendrogram
+
+#calculate a full dendrogram
+from scipy.cluster.hierarchy import dendrogram 
 plt.figure(figsize=(25, 10))
 plt.title('Hierarchical Clustering Dendrogram')
 plt.xlabel('sample index')
 plt.ylabel('distance')
-#dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
-#plt.show()
+dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
+plt.show()
 
+#we create a truncated dendrogram, which only shows the last p=15 out of our 989 merges.
 from scipy.cluster.hierarchy import dendrogram
-plt.title('Hierarchical Clustering Dendrogram (truncated)') #we create a truncated dendrogram, which only shows the last p=15 out of our 989 merges.
+plt.title('Hierarchical Clustering Dendrogram (truncated)') 
 plt.xlabel('sample index')
 plt.ylabel('distance')
-#dendrogram(linkage_object,truncate_mode='lastp',p=15,show_leaf_counts=False,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True)
+dendrogram(linkage_object,truncate_mode='lastp',p=15,show_leaf_counts=False,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True)
 #lastp means 'show only the last p merged clusters',  show_leaf_counts=False, because otherwise numbers in brackets are counts,
 #show_contracted=True, because we want to get a distribution impression in truncated branches
-#plt.show()'''
+plt.show()
+
+#now we create a 'fancy dendrogram' by annotating the distances inside the dendrogram 
+def fancy_dendrogram(*args, **kwargs):
+    max_d = kwargs.pop('max_d', None)
+    if max_d and 'color_threshold' not in kwargs:
+        kwargs['color_threshold'] = max_d
+    annotate_above = kwargs.pop('annotate_above', 0)
+
+    ddata = dendrogram(*args, **kwargs)
+
+    if not kwargs.get('no_plot', False):
+        plt.title('Hierarchical Clustering Dendrogram (truncated and fancy)')
+        plt.xlabel('sample index or (cluster size)')
+        plt.ylabel('distance')
+        for i, d, c in zip(ddata['icoord'], ddata['dcoord'], ddata['color_list']):
+            x = 0.5 * sum(i[1:3])
+            y = d[1]
+            if y > annotate_above:
+                plt.plot(x, y, 'o', c=c)
+                plt.annotate("%.3g" % y, (x, y), xytext=(0, -5),
+                             textcoords='offset points',
+                             va='top', ha='center')
+        if max_d:
+            plt.axhline(y=max_d, c='k')
+    return ddata
+
+fancy_dendrogram(Z,truncate_mode='lastp', p=15,leaf_rotation=90.,leaf_font_size=12., show_contracted=True,annotate_above=10.)
+plt.show()
 
 #Get the number of flat clusters from a linkage matrix at a specified distance.
-'''import numpy
+import numpy
 def num_clusters(hc, d):
 	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
 number_clusters = num_clusters(linkage_object, 30)
-print(number_clusters) #this does not work, i think this is not the right way to print it'''
-
-#creating word clouds
+print(number_clusters) #this does not work, i think this is not the right way to print it
 
 
-'''import os
-from os import path
-from wordcloud import WordCloud
-
-tfidf = TfidfModel(vector_corpus)# first build TF-IDF model
- 
-
-weights = tfidf(vector_corpus[0])# Get TF-IDF weights
- 
-
-weights = [(dictionary[pair[0]], pair[1]) for pair in weights]# Get terms from the dictionary and pair with weights
-# Replace term IDs with human consumable strings
-#weights = [(counts[dictionary[pair[0]]], pair[1]) for pair in weights]
-
-wc = WordCloud(background_color="white",max_words=2000,width = 1024,height = 720)# Initialize the word cloud
-
-
-wc.generate_from_frequencies(weights)# Generate the cloud
- 
-
-wc.to_file("word_cloud_1001nights.png")# Save the cloud to a file
-
-#from scipy.cluster.hierarchy import fcluster
-
-
-
-# Read the whole text.
-text = dictionary
-
-# Generate a word cloud image
-wordcloud = WordCloud().generate(text)
-
-# Display the generated image:
-# the matplotlib way:
-import matplotlib.pyplot as plt
-plt.imshow(wordcloud)
-plt.axis("off")
-
-# lower max_font_size
-wordcloud = WordCloud(max_font_size=40).generate(text)
-plt.figure()
-plt.imshow(wordcloud)
-plt.axis("off")
-plt.show()
-'''
 
 ###############
 #Visualisation
@@ -836,13 +822,49 @@ def color_words_night(model, file):
 night = 'clean_nights/the Eight Hundred and Eighth_filtered.txt'
 #print(color_words_night(ldamodel, night))
 
+#next we try to create word clouds, but we had some trouble installing the WordCloud Package, so we weren't able to test this code
 
+#creating square word clouds for our clean_nights corpus
+from os import path
+from wordcloud import WordCloud
+from matplotlib import plt
+from PIL import Image
+import numpy as np
 
+for file in clean_nights_corpus: #Read the clean_nights corpus
+	f = open(file,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	wordcloud = WordCloud().generate(text) # Generate a word cloud image
 
+plt.imshow(wordcloud)# Display the generated image
+plt.axis("off")
 
+wordcloud = WordCloud(max_font_size=40).generate(text)
+plt.figure()
+plt.imshow(wordcloud)
+plt.axis("off")
+plt.show()
 
+# we make a masked word cloud by using a mask to generate word clouds in arbitrary shapes.
+#Joline!!! ik heb hier in de code nog 'path.join' laten staan, maar ik weet niet of dat daar nog hoort te staan of dat dat hoorde bij
+#d = path.dirname(__file__), wat verwijderd is voor de loop
+for file in clean_nights_corpus:# Read the clean_nights corpus
+	f = open(file,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	skyline_mask = np.array(Image.open(path.join("city+skyline.png")))# read the mask image
+	wc = WordCloud(background_color="white", max_words=2000, mask=skyline_mask)
+	wc.generate(text)# generate word cloud
 
+wc.to_file(path.join( "city+skyline.png"))# store to file
 
+plt.imshow(wc) #make the masked cloud visible
+plt.axis("off")
+plt.figure()
+plt.imshow(skyline_mask, cmap=plt.cm.gray)
+plt.axis("off")
+plt.show()'''
 
 
 
