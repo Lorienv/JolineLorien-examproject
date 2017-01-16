@@ -696,12 +696,12 @@ plt.ylabel('distance')
 #plt.show()'''
 
 #Get the number of flat clusters from a linkage matrix at a specified distance.
-import numpy
+'''import numpy
 def num_clusters(hc, d):
 	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
 number_clusters = num_clusters(linkage_object, 30)
-print(number_clusters)
+print(number_clusters) #this does not work, i think this is not the right way to print it'''
 
 #creating word clouds
 
