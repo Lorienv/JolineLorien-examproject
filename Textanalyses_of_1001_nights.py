@@ -640,7 +640,7 @@ X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 # Evaluate our LDA model
 #########################
 # We will split each document into two parts, and check that topics of the first half are similar to topics 
-# of the second halves. And we check whether two halves of different documents are less similar.
+# of the second half. And we check whether two halves of different documents are less similar.
 # The halves of the same document should be very similar, the halves of different documents should be a bit 
 # less similar, although similarity is expected here as well, since they are all fairy tales.
 def intra_inter(model, test_docs, num_pairs=2000):
@@ -686,6 +686,7 @@ plt.xlabel('sample index')
 plt.ylabel('distance')
 #dendrogram(linkage_object,leaf_rotation=90.,leaf_font_size=8.,)
 #plt.show()
+
 from scipy.cluster.hierarchy import dendrogram
 plt.title('Hierarchical Clustering Dendrogram (truncated)') #we create a truncated dendrogram, which only shows the last p=15 out of our 989 merges.
 plt.xlabel('sample index')
@@ -769,7 +770,14 @@ topic_colors = {0:'#FFC400', 1:'#30a2da', 2:'#FFFAF0', 3:'#FFC0CB', 4:'#B0E0E6',
                 28:'#DC143C', 29:'#00FFFF', 30:'#00008B', 31:'#008B8B', 32:'#B8860B', 33:'#A9A9A9', 34:'#006400',
                 35:'#BDB76B', 36:'#8B008B', 37:'#556B2F', 38:'#FF8C00', 39:'#9932CC', 40:'#E9967A', 41:'#8FBC8F',
                 42:'#483D8B', 43:'#2F4F4F', 44:'#00CED1', 45:'#9400D3', 46:'#FF1493', 47:'#00BFFF', 48:'#696969',
-                49:'#1E90FF', 50:'#B22222'}
+                49:'#1E90FF', 50:'#B22222', 51:'#228B22', 52:'#FF00FF', 53:'#DCDCDC', 54:'#F8F8FF', 55:'#FFD700',
+                56:'#DAA520', 57:'#808080', 58:'#008000', 59:'#ADFF2F', 60:'#F0FFF0', 61:'#FF69B4', 62:'#CD5C5C',
+                63:'#4B0082', 64:'#FFFFF0', 65:'#F0E68C', 66:'#E6E6FA', 67:'#FFF0F5', 68:'#7CFC00', 69:'#FFFACD',
+                70:'#ADD8E6', 71:'#F08080', 72:'#E0FFFF', 73:'#FAFAD2', 74:'#90EE90', 75:'#D3D3D3', 76:'#FFB6C1',
+                77:'#FFA07A', 78:'#20B2AA', 79:'#87CEFA', 80:'#778899', 81:'#B0C4DE', 82:'#FFFFE0', 83:'#00FF00',
+                84:'#32CD32', 85:'#FAF0E6', 86:'#FF00FF', 87:'#800000', 88:'#66CDAA', 89:'#0000CD', 90:'#BA55D3',
+                91:'#9370DB', 92:'#3CB371', 93:'#7B68EE', 94:'#00FA9A', 95:'#48D1CC', 96:'#C71585', 97:'#191970',
+                98:'#F5FFFA', 99:'#FFE4E1'}
 
 def color_words_dictionary(model, dictionary):
     fig = plt.figure()
@@ -797,7 +805,7 @@ def color_words_dictionary(model, dictionary):
 #print(color_words_dictionary(ldamodel, dictionary))  
 
 # In this code will iterate over a particular night and print a set of words that are in the file in 
-# the color of the topic it belongs to. 
+# the color of the topic it belongs to (it also looks at the surrounding words). 
 def color_words_night(model, file):
     f = open(file, 'rt', encoding='utf-8') 
     text = f.read()
@@ -826,7 +834,7 @@ def color_words_night(model, file):
 
 # Say for example, we want to have a look at the Eight Hundred and Eighth night
 night = 'clean_nights/the Eight Hundred and Eighth_filtered.txt'
-print(color_words_night(ldamodel, night))
+#print(color_words_night(ldamodel, night))
 
 
 
