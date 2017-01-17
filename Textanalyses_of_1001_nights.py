@@ -638,6 +638,41 @@ print(len(X))
 print(X[0])
 '''
 
+################
+#Topic richness
+################
+from nltk import FreqDist #verwijderen als alles 'aan' staat
+# This code will compute how many topics are assigned to each file
+number_of_topics = {} # we make a dictionary so that it is easy to look up the file and its number of topics
+number_of_topics_list = [] #we also make a list which comes in handy to calculate which file has the highest amount of topics
+for file in clean_nights_corpus:
+	f = open(file,'rt', encoding='utf-8')
+	text = f.read()
+	f.close()
+	text = nltk.word_tokenize(text)
+	bow_vector = dictionary.doc2bow(text)
+	lda_vector = ldamodel[bow_vector]
+	name = file[13:-13] #filter out 'clean_nights/' and '_filtered.txt'
+	number_of_topics[name] = len(lda_vector)
+	number_of_topics_list.append((name, len(lda_vector)))
+
+for file, topics in number_of_topics_list:
+	if topics == max(number_of_topics.values()):
+		print(file, ' has the highest amount of topics: ', topics)
+	if topics == min(number_of_topics.values()):
+		print(file, ' has the lowest amount of topics: ', topics)	
+
+# In order to know what number of topics occurs most often, we make a FreqDist:
+fdist_topics = FreqDist(number_of_topics.values())	
+print(fdist.max(), ' is the number of topics that occurs most often')	
+
+# We also want a top 10 of the files
+
+from collections import Counter
+top_10 = (dict(Counter(number_of_topics).most_common(10)))	
+print(top_10)
+
+
 #########################
 # Evaluate our LDA model
 #########################
@@ -737,8 +772,6 @@ def num_clusters(hc, d):
 number_clusters = num_clusters(linkage_object, 30)
 print(number_clusters) #this does not work, i think this is not the right way to print it
 
-
-
 ###############
 #Visualisation
 ###############
@@ -822,6 +855,7 @@ def color_words_night(model, file):
 night = 'clean_nights/the Eight Hundred and Eighth_filtered.txt'
 #print(color_words_night(ldamodel, night))
 
+#############################
 #next we try to create word clouds, but we had some trouble installing the WordCloud Package, so we weren't able to test this code
 
 #creating square word clouds for our clean_nights corpus
