@@ -2,9 +2,9 @@
 #Text analyses of 1001-nights#
 ##############################
 
-# Make a corpus of the ten volumes:
-from os import listdir
 
+from os import listdir
+# Make a corpus of the ten volumes:
 def list_10_volumes(directory):
 	volumes = []
 	for volume in listdir(directory):
@@ -543,9 +543,9 @@ vector_corpus = [dictionary.doc2bow(text) for text in nested_list] # this gives 
 # Ready for topic modeling
 #######################################
 
-#import numpy
+import numpy as np
 
-#numpy.random.seed(1) #setting random seed to get the same results each time.
+np.random.seed(1) #setting random seed to get the same results each time.
 ldamodel = gensim.models.LdaModel(vector_corpus, num_topics=100, id2word = dictionary, passes=5)
 # first parameter: determine how many topics should be generated. Our document set is relatively large, so we’re  asking for 100 topics.
 # second parameter: our previous dictionary to map ids to strings
@@ -629,7 +629,6 @@ for file in clean_nights_corpus:
 f_out.close()'''	
 
 # Now we make a matrix of the documents & topics:
-import numpy as np
 X = ldamodel.show_topics(num_topics= 100, num_words=10) #not necessary, was just a test to see if it made any difference
 X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
@@ -682,15 +681,15 @@ for file in clean_nights_corpus:
 	number_of_topics[name] = len(lda_vector)
 	number_of_topics_list.append((name, len(lda_vector)))
 
-for file, topics in number_of_topics_list:
+'''for file, topics in number_of_topics_list:
 	if topics == max(number_of_topics.values()):
 		print(file, ' has the highest amount of topics: ', topics)
 	if topics == min(number_of_topics.values()):
 		print(file, ' has the lowest amount of topics: ', topics)
 
-'''# We also want to now what the average number of topics is
+# We also want to now what the average number of topics is
 from statistics import mean
-print('The average number of topics is', mean(number_of_topics.values()))
+print('The average number of topics is', int(mean(number_of_topics.values())))
 
 # In order to know what number of topics occurs most often, we make a FreqDist:
 fdist_topics = FreqDist(number_of_topics.values())	
@@ -700,23 +699,57 @@ fdist_topics = FreqDist(number_of_topics.values())
 
 from collections import Counter
 top_10 = (dict(Counter(number_of_topics).most_common(10)))	
-#print(top_10) 
+#print(top_10) '''
 
 # Create a table of the file with the maximum and minimum number of topics
- import pandas as pd #nog weg doen op het einde
+import pandas as pd #nog weg doen op het einde
 
-maxmin_topics= []
-for topics in lda_vector: #get the topics for the maximum topics file and the minimum topics file
-	maxmin_topics = maxmin_topics.append(ldamodel.show_topics(topics[]))
-	maxmin_topics = maxmin_topics.append(ldamodel.show_topics(topics[]))
+# First we need the lda vector of the night with the maximum number of topics
+f = open('clean_nights/the Three Hundred and Fifty-seventh_filtered.txt','rt', encoding='utf-8') 
+text = f.read()
+f.close()
+text = nltk.word_tokenize(text)
+bow_vector = dictionary.doc2bow(text)
+lda_vector_maxtop = ldamodel[bow_vector]
+print(lda_vector_maxtop)
 
-column1 = ['max number of topics', 'min number of topics' ]
-column2 = ['night1', 'night2']
-column3 = ['19', '15']
+# Then we need the lda vector of the night with the minimum number of topics
+f = open('clean_nights/the Six Hundred and Sixty-seventh_filtered.txt','rt', encoding='utf-8')
+text = f.read()
+f.close()
+text = nltk.word_tokenize(text)
+bow_vector = dictionary.doc2bow(text)
+lda_vector_mintop = ldamodel[bow_vector]
+print(lda_vector_mintop)
+
+x = []
+maxmin_topics = []
+for topics in lda_vector_maxtop: # get the topics for the maximum topics file and the minimum topics file
+	x.append(ldamodel.show_topics(topics[0]))
+	for tuples in x:
+		y = tuples [1]
+		print(y) 
+		#y = text.split() 
+		#y = text[:10]
+		#maxmin_topics.append(' '.join(y))
+		
+'''for topics in lda_vector_mintop: # get the topics for the minimum topics file
+	x.append(ldamodel.show_topics(topics[0]))
+	for tuples in x:
+		z = tuples [1] 
+		z = text.split() 
+		z = text[:10]
+		maxmin_topics.append(' '.join(z))
+		print(z)
+	
+
+column1 = ['max number of topics','' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,  'min number of topics', '', '','' ]
+column2 = ['The Six Hundred and Sixty-second','' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' , 'The Three Hundred and Fifty-seventh', '', '','']
+column3 = ['21', '' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' , '4', '', '','']
 column4 = maxmin_topics
 
 df = pd.DataFrame({'Max/Min topics': column1,'Nights': column2,'Number of topics': column3, 'Topics': column4})
-#print(df) #show the data frame
+print(df) #show the data frame
 
 from pandas import ExcelWriter as xlwt #nog weg doen
 from xlwt import Workbook #nog weg doen
