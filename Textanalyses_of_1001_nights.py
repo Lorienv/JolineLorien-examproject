@@ -634,9 +634,35 @@ X = ldamodel.show_topics(num_topics= 100, num_words=10) #not necessary, was just
 X = np.array(corpus) #should be the matrix containing the nights & the topics'''
 
 #print(X.shape) to check if the shape of our matrix is suitable for hierarchical clustering, it shoudl give the number of files and number of topics
-print(len(X))
-print(X[0])
-'''
+
+#########################
+# Evaluate our LDA model
+#########################
+# We will split each document into two parts, and check that topics of the first half are similar to topics 
+# of the second half. And we check whether two halves of different documents are less similar.
+# The halves of the same document should be very similar, the halves of different documents should be a bit 
+# less similar, although similarity is expected here as well, since they are all fairy tales.
+'''def intra_inter(model, test_docs, num_pairs=2000):
+    part1 = []
+    part2 = []
+    for file in test_docs:
+    	f = open(file, 'rt', encoding='utf-8') 
+    	text = f.read()
+    	f.close()
+    	text = nltk.word_tokenize(text)# split each test document into two halves and compute topics for each half
+    	x = round(len(text)/ 2)
+        part1.append(model[dictionary.doc2bow(text[:x])])
+        part2.append(model[dictionary.doc2bow(text[x:])])
+    
+    # print computed similarities (uses cossim)
+    print('average cosine similarity between corresponding parts (higher is better):')
+    print(np.mean([gensim.matutils.cossim(p1, p2) for p1, p2 in zip(part1, part2)]))
+
+    random_pairs = np.random.randint(0, len(test_docs), size=(num_pairs, 2))
+    print('average cosine similarity between 2000 random parts (should be a bit lower):')    
+    print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
+
+print(intra_inter(ldamodel, clean_nights_corpus))   '''
 
 ################
 #Topic richness
@@ -660,47 +686,48 @@ for file, topics in number_of_topics_list:
 	if topics == max(number_of_topics.values()):
 		print(file, ' has the highest amount of topics: ', topics)
 	if topics == min(number_of_topics.values()):
-		print(file, ' has the lowest amount of topics: ', topics)	
+		print(file, ' has the lowest amount of topics: ', topics)
+
+'''# We also want to now what the average number of topics is
+from statistics import mean
+print('The average number of topics is', mean(number_of_topics.values()))
 
 # In order to know what number of topics occurs most often, we make a FreqDist:
 fdist_topics = FreqDist(number_of_topics.values())	
-print(fdist.max(), ' is the number of topics that occurs most often')	
+#print(fdist_topics.max(), ' is the number of topics that occurs most often')	
 
-# We also want a top 10 of the files
+# We also want a top 10 of the files, the files with the highest number of topics
 
 from collections import Counter
 top_10 = (dict(Counter(number_of_topics).most_common(10)))	
-print(top_10)
+#print(top_10) 
+
+# Create a table of the file with the maximum and minimum number of topics
+ import pandas as pd #nog weg doen op het einde
+
+maxmin_topics= []
+for topics in lda_vector: #get the topics for the maximum topics file and the minimum topics file
+	maxmin_topics = maxmin_topics.append(ldamodel.show_topics(topics[]))
+	maxmin_topics = maxmin_topics.append(ldamodel.show_topics(topics[]))
+
+column1 = ['max number of topics', 'min number of topics' ]
+column2 = ['night1', 'night2']
+column3 = ['19', '15']
+column4 = maxmin_topics
+
+df = pd.DataFrame({'Max/Min topics': column1,'Nights': column2,'Number of topics': column3, 'Topics': column4})
+#print(df) #show the data frame
+
+from pandas import ExcelWriter as xlwt #nog weg doen
+from xlwt import Workbook #nog weg doen
+writer = xlwt('table of max and min number topics.xlsx') #create an excel file from the data frame
+workbook = writer.book #define the excel workbook
+df.to_excel(writer, 'Sheet1') #place the data frame on the first sheet of the excel file
+worksheet = writer.sheets['Sheet1'] #define the worksheet
+worksheet.set_column('B:F',35) #set the column width for columns B up to F, so we can see all the text in the cells'''
 
 
-#########################
-# Evaluate our LDA model
-#########################
-# We will split each document into two parts, and check that topics of the first half are similar to topics 
-# of the second half. And we check whether two halves of different documents are less similar.
-# The halves of the same document should be very similar, the halves of different documents should be a bit 
-# less similar, although similarity is expected here as well, since they are all fairy tales.
-def intra_inter(model, test_docs, num_pairs=2000):
-    part1 = []
-    part2 = []
-    for file in test_docs:
-    	f = open(file, 'rt', encoding='utf-8') 
-    	text = f.read()
-    	f.close()
-    	text = nltk.word_tokenize(text)# split each test document into two halves and compute topics for each half
-    	x = round(len(text)/ 2)
-        part1.append(model[dictionary.doc2bow(text[:x])])
-        part2.append(model[dictionary.doc2bow(text[x:])])
-    
-    # print computed similarities (uses cossim)
-    print('average cosine similarity between corresponding parts (higher is better):')
-    print(np.mean([gensim.matutils.cossim(p1, p2) for p1, p2 in zip(part1, part2)]))
 
-    random_pairs = np.random.randint(0, len(test_docs), size=(num_pairs, 2))
-    print('average cosine similarity between 2000 random parts (should be a bit lower):')    
-    print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
-
-print(intra_inter(ldamodel, clean_nights_corpus))   '''
 
 ###########################################
 # Hierarchical clustering with topic model
@@ -710,7 +737,7 @@ import numpy as np
 
 from scipy.spatial.distance import pdist, squareform
 dm = squareform(pdist(X, 'cosine'))#'cosine'is one of the methods that can be used to calculate the distance between newly formed clusters
-								   #we use the cosine similarity because it works better for topic clustering
+								   #we use the cosine similarity because it works good for topic clustering
 
 from scipy.cluster.hierarchy import linkage #creating a linkage matrix
 linkage_object = linkage(dm, method='ward', metric='euclidean')
@@ -765,7 +792,6 @@ fancy_dendrogram(Z,truncate_mode='lastp', p=15,leaf_rotation=90.,leaf_font_size=
 plt.show()
 
 #Get the number of flat clusters from a linkage matrix at a specified distance.
-import numpy
 def num_clusters(hc, d):
 	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
@@ -781,7 +807,7 @@ import matplotlib.patches as patches
 # This code will iterate over the dictionary and print a random set of words in the color of the topic 
 # it belongs to most. 
 
-# These are colors assigned to the fifty topics.
+# These are colors assigned to the hundred topics.
 topic_colors = {0:'#FFC400', 1:'#30a2da', 2:'#FFFAF0', 3:'#FFC0CB', 4:'#B0E0E6', 5:'#FF0000', 6:'#FAA460', 7:'#2E8B57', 
                 8:'#FFF5EE', 9:'#A0522D', 10:'#C0C0C0', 11:'#87CEEB', 12:'#00FFFF', 13:'#7FFFD4', 
                 14:'#F0FFFF', 15:'#F5F5DC', 16:'#FFE4C4', 17:'#000000', 18:'#FFEBCD', 19:'#0000FF', 20:'#8A2BE2',
@@ -881,17 +907,15 @@ plt.axis("off")
 plt.show()
 
 # we make a masked word cloud by using a mask to generate word clouds in arbitrary shapes.
-#Joline!!! ik heb hier in de code nog 'path.join' laten staan, maar ik weet niet of dat daar nog hoort te staan of dat dat hoorde bij
-#d = path.dirname(__file__), wat verwijderd is voor de loop
 for file in clean_nights_corpus:# Read the clean_nights corpus
 	f = open(file,'rt', encoding='utf-8')
 	text = f.read()
 	f.close()
-	skyline_mask = np.array(Image.open(path.join("city+skyline.png")))# read the mask image
+	skyline_mask = np.array(Image.open("city+skyline.png")))# read the mask image
 	wc = WordCloud(background_color="white", max_words=2000, mask=skyline_mask)
 	wc.generate(text)# generate word cloud
 
-wc.to_file(path.join( "city+skyline.png"))# store to file
+wc.to_file("city+skyline.png")# store to file
 
 plt.imshow(wc) #make the masked cloud visible
 plt.axis("off")
