@@ -369,6 +369,39 @@ for file in corpus_nightsII.fileids():
 	fdist = FreqDist(x)
 	dict_word_length[file] = fdist.max()
 #print(dict_word_length)
+
+# We now calculate the readability for each file. We do this by using the Automated Readability Index (ARI).
+stat_list = []
+x = word_dic_nights.keys()
+for name in x:
+	n_char = char_dict_night[name]
+	n_words = word_dic_nights[name]
+	n_sents = sentence_dic_nights[name]
+	stat_list.append((name, n_char, n_words, n_sents))
+print(stat_list)
+
+def ARI(n_char, n_words, n_sents):
+	x = n_char/n_words
+	y = n_words/n_sents
+
+	ARI_score = 4.71*x + 0.5*y - 21.43
+
+	return ARI_score
+
+ARI_list = []
+ARI_dic = {}
+for tuples in stat_list:
+	ARI_score = ARI(tuples[1], tuples[2], tuples[3])
+	ARI_score = round(ARI_score, 2)
+	ARI_dic[tuples[0]] = ARI_score
+	ARI_list.append((tuples[0], ARI_score))
+
+# Which night is the most/ least difficult text to read according to the readability-score?
+for night, ARI_score in ARI_list:
+	if ARI_score == max(ARI_dic.values()):
+		print('The night with the highest ARI_score is:', night,':', ARI_score)
+	if ARI_score == min(ARI_dic.values()):
+		print('The night with the lowest ARI_score is:', night,':', ARI_score)		
 '''
 #####################################
 #visualise statistics for each night
