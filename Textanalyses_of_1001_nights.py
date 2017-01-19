@@ -234,9 +234,9 @@ table_statistics = tab.draw()#table is returned as a string
 from docx import Document
 from docx.shared import Inches
 document = Document()
-document.add_heading('Visualisation of the statistics')
-document.add_paragraph('Overview of the characters per volume')
-document.add_picture('characters_per_volume.png', width=Inches(5.25))
+document.add_heading('Visualisation of the statistics') # we add a title
+document.add_paragraph('Overview of the characters per volume') # we add subtitles
+document.add_picture('characters_per_volume.png', width=Inches(5.25)) # with width we make sure the figure fits on the page
 document.add_page_break()
 document.add_paragraph('Overview of the words per volume')
 document.add_picture('words_per_volume.png', width=Inches(5.25))
@@ -244,7 +244,7 @@ document.add_paragraph('Overview of the sentences per volume')
 document.add_picture('sentences_per_volume.png', width=Inches(5.25))
 document.add_paragraph('Overview of the lines per volume')
 document.add_picture('lines_per_volume.png', width=Inches(5.25))
-document.save('Statistics.docx')
+#document.save('Statistics.docx')
 
 
 ##################################
@@ -805,6 +805,9 @@ maxmin_topics = [] #make a nested list with as first list max_top and second lis
 maxmin_topics.append(max_top)
 maxmin_topics.append(min_top) 
 
+# Each time you run lda_vector_maxtop or lda_vector_mintop, you get slightly different results. So the number of topics that is found, can differ.
+# So the data for the table can change to. We chose to make a table with the results from the latest run.
+# But we are aware that this is not necessarely the correct answer to the 'maximum topics and minimum topics answer'.
 
 #prepare the data for the data frame
 column1 = ['max number of topics', 'min number of topics' ]
@@ -890,8 +893,7 @@ plt.show()
 def num_clusters(hc, d):
 	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
-number_clusters = num_clusters(linkage_object, 30)
-print(number_clusters) #this does not work, i think this is not the right way to print it
+print(num_clusters(linkage_object, 30)) 
 
 ###############
 #Visualisation
