@@ -13,11 +13,11 @@ def list_10_volumes(directory):
 	return volumes
 
 corpus = list_10_volumes('data')
-print(corpus)
+#print(corpus)
 
 # How many characters does each volume in the corpus have? 
 # and how many characters does the entire corpus have?
-'''def calculate_characters(corpus):
+def calculate_characters(corpus):
 	counter = 0
 	characters_per_volume = []
 	for volume in corpus:
@@ -28,7 +28,7 @@ print(corpus)
 		counter+= len(text)
 	return characters_per_volume, 'Together, the ten volumes have ' + str(counter) + ' characters.'
 
-print(calculate_characters(corpus))	
+#print(calculate_characters(corpus))	
 
 # How many lines does the entire corpus have?
 def calculate_lines(corpus):
@@ -38,9 +38,9 @@ def calculate_lines(corpus):
 		for line in f:
 			count += 1
 		f.close()	
-	print('The corpus of ten volumes has ' + str(count) + ' lines.')	
+	#print('The corpus of ten volumes has ' + str(count) + ' lines.')	
 			
-print(calculate_lines(corpus))	
+#print(calculate_lines(corpus))	
 
 # How many lines does each volume have?
 def calculate_lines_II(file):
@@ -63,24 +63,23 @@ corpus_root= 'data'
 volumes = PlaintextCorpusReader(corpus_root, 'arabian.*')
 
 list_of_sentences = volumes.sents()
-print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
+#print('The ten volumes consist of ' + str(len(list_of_sentences)) + ' sentences')
 
 list_of_words = volumes.words()
-print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
+#print('The ten volumes consist of ' + str(len(list_of_words)) + ' words')
 
 for item in volumes.fileids(): #calculate the amount of words in each volume
 	print(item,':', len(volumes.words(item)), 'words')
 
 for item in volumes.fileids(): #calculate the amount of sentences in each volume
 	print(item,':', len(volumes.sents(item)), 'sentences')	
-'''
+
 ##################################################################
 #visualisation of the statistiscs with basic plotting techniques
 ##################################################################
-'''
+
 import matplotlib.pyplot as plt #pyhton library for plotting data
 import numpy as np
-#%matplotlib inline #only necessary when you need to use the code in Jupyter Notebook
 
 #visualise the characters per volume
 #make a list of the total characters per volume -
@@ -108,6 +107,7 @@ plt.title("total number of characters in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of characters")
 plt.xticks(x,x_labels)
+#plt.savefig('characters_per_volume.png')
 #plt.show()
 
 #visualise the lines per volume
@@ -139,6 +139,7 @@ plt.title("total number of lines in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of lines")
 plt.xticks(x,x_labels)
+#plt.savefig('lines_per_volume.png')
 #plt.show()
 
 #visualise the sentences per volume
@@ -170,6 +171,7 @@ plt.title("total number of sentences in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of sentences")
 plt.xticks(x,x_labels)
+#plt.savefig('sentences_per_volume.png')
 #plt.show()
 
 
@@ -202,10 +204,11 @@ plt.title("total number of words in a volume")
 plt.xlabel("volume")
 plt.ylabel("# of words")
 plt.xticks(x,x_labels)
+#plt.savefig('words_per_volume.png')
 #plt.show()
 
 #visualise all the total numbers for the entire corpus (= ten volumes of The Arabian Nights)
-import texttable as tt#import texttable module
+'''import texttable as tt#import texttable module
 tab = tt.Texttable() #initialize texttable object
 
 header = ['Corpus', 'Total characters', 'Total lines', 'Total sentences', 'Total words']#To insert a header we create a list with each element containing the title of a column
@@ -225,27 +228,44 @@ tab.set_chars(['-','|','+','#'])#list of elements which determine character used
 #intersection points of these lines and the header line, in that order
 
 table_statistics = tab.draw()#table is returned as a string
-#print(table_statistics)
-'''
+#print(table_statistics)'''
+
+# Now we create a Word document which contains the graphs, so we have an overview
+from docx import Document
+from docx.shared import Inches
+document = Document()
+document.add_heading('Visualisation of the statistics') # we add a title
+document.add_paragraph('Overview of the characters per volume') # we add subtitles
+document.add_picture('characters_per_volume.png', width=Inches(5.25)) # with width we make sure the figure fits on the page
+document.add_page_break()
+document.add_paragraph('Overview of the words per volume')
+document.add_picture('words_per_volume.png', width=Inches(5.25))
+document.add_paragraph('Overview of the sentences per volume')
+document.add_picture('sentences_per_volume.png', width=Inches(5.25))
+document.add_paragraph('Overview of the lines per volume')
+document.add_picture('lines_per_volume.png', width=Inches(5.25))
+#document.save('Statistics.docx')
+
+
 ##################################
 #Separate the volumes into nights
 ##################################
-
+'''
 # Now that we know some of the statistics about each volume and the entire corpus, we
 # want to have a look at the individual nights. 
 
 # To make sure all the volumes are automatically read. 
-'''read_corpus = []
+read_corpus = []
 for volume in corpus:
 	f = open(volume, 'rt', encoding='utf-8') 
 	text = f.read()
 	f.close()
-	read_corpus.append(text)'''
+	read_corpus.append(text)
 
 import re
 
 # Two definitions that can find the starting and ending index of each night. 
-'''def start_idex_nights(regex, text, flags=re.IGNORECASE): # So it is case insensitive.
+def start_idex_nights(regex, text, flags=re.IGNORECASE): # So it is case insensitive.
 	start_index = []
 	for match in re.finditer(regex, text, flags):
 		start_index.append(match.start())
@@ -402,14 +422,14 @@ for night, ARI_score in ARI_list:
 		print('The night with the highest ARI_score is:', night,':', ARI_score)
 	if ARI_score == min(ARI_dic.values()):
 		print('The night with the lowest ARI_score is:', night,':', ARI_score)		
-'''
+
 #####################################
 #visualise statistics for each night
 ##################################### 
 
 #collect data for table with total numbers for each night
 
-'''characters_per_night = [] #list of the characters per night
+characters_per_night = [] #list of the characters per night
 for tuples in char_list_night:
 	characters_per_night.append(tuples[1])	
 print(characters_per_night)
@@ -494,7 +514,7 @@ for file in listdir('data'):
 	if pattern.search(file):
 		corpus_tales.append('data' + '/' + file)
 print(len(corpus_tales)) #for topic modeling we should have a minimum of 1000 files, now we have 1030 files (990 nights and some additional tales)
-'''
+
 #Now that we have our corpus, we need to tokenize every file so we can leave out the punctuation, stopwords, words that occur only once
 # modals, cardinal numbers... and save them in 'clean_doc'.
 import string
@@ -509,7 +529,7 @@ p_stemmer = PorterStemmer()
 from collections import defaultdict
 frequency = defaultdict(int)# make an empty default dict so we can compute the frequency of the words and delete words that only occur once
 
-'''for tale in corpus_tales:
+for tale in corpus_tales:
 	filtered_text = []
 	f = open(tale,'rt', encoding='utf-8')
 	text = f.read()
@@ -540,9 +560,10 @@ frequency = defaultdict(int)# make an empty default dict so we can compute the f
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
 	f_out.close()
-'''
+
 
 # Now we make a new corpus consisting of the filtered texts
+import re #nog weg doen
 pattern = re.compile(r'[Tt]he') 
 clean_corpus= []
 for file in listdir('clean_doc'):
@@ -597,7 +618,7 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 
 # We are not sure whether we need to clean the testcorpus as well. We did it to be sure.
 
-'''for night in corpus_nightsII.fileids():
+for night in corpus_nightsII.fileids():
 	filtered_text = []
 	f = open('data/' + night, 'rt', encoding='utf-8') 
 	text = f.read()
@@ -627,7 +648,7 @@ ldamodel = gensim.models.LdaModel.load('topicmodel.lda')
 	filename = 'clean_nights/' + str(night[:-4]) + '_filtered' + '.txt'
 	f_out = open(filename,'wt', encoding='utf-8')
 	f_out.write(' '.join(filtered_text))
-	f_out.close()'''
+	f_out.close()
 
 # The cleaned nights are now in 'clean_nights', now we can convert them to a BOW representation	
 pattern = re.compile(r'[Tt]he') 
@@ -649,7 +670,7 @@ for file in clean_nights_corpus:
 	corpus.append(lda_vector)
 
 # Now we would like to print every document's single most prominent LDA topic in a separate txt file
-'''f_out = open('topic_per_night.txt','at', encoding='utf-8')
+f_out = open('topic_per_night.txt','at', encoding='utf-8')
 for file in clean_nights_corpus:
 	f = open(file,'rt', encoding='utf-8')
 	text = f.read()
@@ -659,7 +680,7 @@ for file in clean_nights_corpus:
 	lda_vector = ldamodel[bow_vector]
 	topic = ldamodel.print_topic(max(lda_vector, key=lambda item: item[1])[0])
 	f_out.write('\n' + file + ':\n' + topic + '\n')
-f_out.close()'''	
+f_out.close()	
 
 # Now we make a matrix of the documents & topics:
 X = ldamodel.show_topics(num_topics= 100, num_words=10) #not necessary, was just a test to see if it made any difference
@@ -694,7 +715,7 @@ X = np.array(corpus) #should be the matrix containing the nights & the topics'''
     print('average cosine similarity between 2000 random parts (should be a bit lower):')    
     print(np.mean([gensim.matutils.cossim(part1[i[0]], part2[i[1]]) for i in random_pairs]))
 
-print(intra_inter(ldamodel, clean_nights_corpus))   '''
+print(intra_inter(ldamodel, clean_nights_corpus))   
 
 ################
 #Topic richness
@@ -714,7 +735,7 @@ for file in clean_nights_corpus:
 	number_of_topics[name] = len(lda_vector)
 	number_of_topics_list.append((name, len(lda_vector)))
 
-'''for file, topics in number_of_topics_list:
+for file, topics in number_of_topics_list:
 	if topics == max(number_of_topics.values()):
 		print(file, ' has the highest amount of topics: ', topics)
 	if topics == min(number_of_topics.values()):
@@ -732,7 +753,7 @@ fdist_topics = FreqDist(number_of_topics.values())
 
 from collections import Counter
 top_10 = (dict(Counter(number_of_topics).most_common(10)))	
-#print(top_10) '''
+#print(top_10) 
 
 # Create a table of the file with the maximum and minimum number of topics
 import pandas as pd #nog weg doen op het einde
@@ -743,42 +764,55 @@ text = f.read()
 f.close()
 text = nltk.word_tokenize(text)
 bow_vector = dictionary.doc2bow(text)
-lda_vector_maxtop = ldamodel[bow_vector]
-print(lda_vector_maxtop)
+lda_vector_mintop = ldamodel[bow_vector]
+#print(lda_vector_mintop)
 
 # Then we need the lda vector of the night with the minimum number of topics
-f = open('clean_nights/the Six Hundred and Sixty-seventh_filtered.txt','rt', encoding='utf-8')
+f = open('clean_nights/the Six Hundred and Sixty-second_filtered.txt','rt', encoding='utf-8')
 text = f.read()
 f.close()
 text = nltk.word_tokenize(text)
 bow_vector = dictionary.doc2bow(text)
-lda_vector_mintop = ldamodel[bow_vector]
-print(lda_vector_mintop)
+lda_vector_maxtop = ldamodel[bow_vector]
+#print(lda_vector_maxtop)
 
-x = []
-maxmin_topics = []
-for topics in lda_vector_maxtop: # get the topics for the maximum topics file and the minimum topics file
-	x.append(ldamodel.show_topics(topics[0]))
-	for tuples in x:
-		y = tuples [1]
-		print(y) 
-		#y = text.split() 
-		#y = text[:10]
-		#maxmin_topics.append(' '.join(y))
+def final_topics(lda_vector):
+	x = []
+	for topics in lda_vector:  # get the topics for the maximum topics file and the minimum topics file
+		x.append(ldamodel.show_topic(topics[0]))
 		
-'''for topics in lda_vector_mintop: # get the topics for the minimum topics file
-	x.append(ldamodel.show_topics(topics[0]))
-	for tuples in x:
-		z = tuples [1] 
-		z = text.split() 
-		z = text[:10]
-		maxmin_topics.append(' '.join(z))
-		print(z)
-	
+	y = []
+	z = []
+	for list1 in x:
+		for tuples in list1:
+			y.append(tuples[0]) # add the words belonging tho the same topic to a list
+		z.append(y) # add that list to z
+		y = []	# empty list y again for the next topic
+		
 
-column1 = ['max number of topics','' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,  'min number of topics', '', '','' ]
-column2 = ['The Six Hundred and Sixty-second','' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' , 'The Three Hundred and Fifty-seventh', '', '','']
-column3 = ['21', '' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' , '4', '', '','']
+		final_topic_list = []
+		for topic in z:
+			topic = topic [:5] # now we get only the first five words per topic
+			topic = ' '.join(topic)
+			final_topic_list.append(topic)
+	return final_topic_list
+max_top = (final_topics(lda_vector_maxtop))
+min_top = (final_topics(lda_vector_mintop))
+print(len(max_top)) # to check if it matches the number of topics in the table we will make later on
+print(len(min_top))
+
+maxmin_topics = [] #make a nested list with as first list max_top and second list min_top
+maxmin_topics.append(max_top)
+maxmin_topics.append(min_top) 
+
+# Each time you run lda_vector_maxtop or lda_vector_mintop, you get slightly different results. So the number of topics that is found, can differ.
+# So the data for the table can change to. We chose to make a table with the results from the latest run.
+# But we are aware that this is not necessarely the correct answer to the 'maximum topics and minimum topics answer'.
+
+#prepare the data for the data frame
+column1 = ['max number of topics', 'min number of topics' ]
+column2 = ['The Six Hundred and Sixty-second', 'The Three Hundred and Fifty-seventh']
+column3 = ['16', '5']
 column4 = maxmin_topics
 
 df = pd.DataFrame({'Max/Min topics': column1,'Nights': column2,'Number of topics': column3, 'Topics': column4})
@@ -790,10 +824,8 @@ writer = xlwt('table of max and min number topics.xlsx') #create an excel file f
 workbook = writer.book #define the excel workbook
 df.to_excel(writer, 'Sheet1') #place the data frame on the first sheet of the excel file
 worksheet = writer.sheets['Sheet1'] #define the worksheet
-worksheet.set_column('B:F',35) #set the column width for columns B up to F, so we can see all the text in the cells'''
-
-
-
+worksheet.set_column('B:Q',35) #set the column width for columns B up to Q, so we can see all the text in the cells'''
+#writer.save()
 
 ###########################################
 # Hierarchical clustering with topic model
@@ -861,8 +893,7 @@ plt.show()
 def num_clusters(hc, d):
 	return len(numpy.unique(scipy.cluster.hierarchy.fcluster(linkage_object, 30, criterion='distance')))#d (number): Distance threshold for defining flat clusters.
 
-number_clusters = num_clusters(linkage_object, 30)
-print(number_clusters) #this does not work, i think this is not the right way to print it
+print(num_clusters(linkage_object, 30)) 
 
 ###############
 #Visualisation
