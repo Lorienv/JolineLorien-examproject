@@ -1,4 +1,4 @@
-Text Analysis of 1001 Nights (with Latent Dirichlet Allocation)
+#Text Analysis of 1001 Nights (with Latent Dirichlet Allocation)
 
 In this project, we perform a text analysis on the tales of 1001 Nights.
 
